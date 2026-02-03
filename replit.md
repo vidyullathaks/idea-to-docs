@@ -4,6 +4,11 @@
 IdeaForge is an AI-powered tool that transforms rough product ideas into structured Product Requirements Documents (PRDs), user stories, and acceptance criteria. Built with a modern React frontend and Express backend, powered by OpenAI's GPT-5.2 model.
 
 ## Recent Changes
+- **2026-02-03**: Added hero section and UX improvements
+  - Compelling hero headline: "Turn Any Idea Into a Complete PRD"
+  - "How It Works" section with 3 steps (Describe, Generate, Export)
+  - Footer with branding "IdeaForge — AI-Powered PRD Generator"
+  - Hero section contextually shows/hides based on view state
 - **2026-02-03**: Added analytics, About section, AI disclaimer, and export options
   - Analytics table tracks PRD generation time, idea length, and export events
   - About dialog with app description, target users, usage instructions, and live stats
