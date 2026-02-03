@@ -55,9 +55,12 @@ export async function registerRoutes(
       }
 
       const { idea } = validation.data;
+      const startTime = Date.now();
       
       // Generate PRD using AI
       const generated = await generatePrd(idea);
+      
+      const generationTime = Date.now() - startTime;
       
       // Save to database
       const prd = await storage.createPrd({
@@ -73,6 +76,17 @@ export async function registerRoutes(
         assumptions: generated.assumptions,
         status: "draft",
       });
+      
+      // Log analytics
+      await storage.logAnalytics({
+        eventType: 'prd_generated',
+        prdId: prd.id,
+        ideaLength: idea.length,
+        generationTimeMs: generationTime,
+        sessionId: req.headers['x-session-id'] as string || null,
+      });
+      
+      console.log(`[Analytics] PRD generated: id=${prd.id}, ideaLength=${idea.length}, time=${generationTime}ms`);
       
       res.status(201).json(prd);
     } catch (error) {
@@ -96,6 +110,50 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting PRD:", error);
       res.status(500).json({ message: "Failed to delete PRD" });
+    }
+  });
+
+  // Log export event
+  const exportSchema = z.object({
+    prdId: z.number().optional(),
+    exportType: z.enum(['markdown', 'notion', 'jira']).optional().default('markdown'),
+  });
+
+  app.post("/api/analytics/export", async (req, res) => {
+    try {
+      const validation = exportSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: validation.error.errors[0]?.message || "Invalid input" 
+        });
+      }
+
+      const { prdId, exportType } = validation.data;
+      
+      await storage.logAnalytics({
+        eventType: 'prd_exported',
+        prdId: prdId || null,
+        exportType: exportType,
+        sessionId: req.headers['x-session-id'] as string || null,
+      });
+      
+      console.log(`[Analytics] PRD exported: prdId=${prdId}, type=${exportType}`);
+      
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Error logging export:", error);
+      res.status(500).json({ message: "Failed to log export" });
+    }
+  });
+
+  // Get analytics summary
+  app.get("/api/analytics/summary", async (req, res) => {
+    try {
+      const summary = await storage.getAnalyticsSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics" });
     }
   });
 

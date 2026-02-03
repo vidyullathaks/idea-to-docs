@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, timestamp, jsonb, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -40,6 +40,26 @@ export const insertPrdSchema = createInsertSchema(prds).omit({
 
 export type InsertPrd = z.infer<typeof insertPrdSchema>;
 export type Prd = typeof prds.$inferSelect;
+
+// Analytics table for tracking usage
+export const analytics = pgTable("analytics", {
+  id: serial("id").primaryKey(),
+  eventType: text("event_type").notNull(), // 'prd_generated', 'prd_viewed', 'prd_exported'
+  prdId: integer("prd_id"),
+  ideaLength: integer("idea_length"),
+  generationTimeMs: integer("generation_time_ms"),
+  exportType: text("export_type"), // 'markdown', 'notion', 'jira'
+  sessionId: text("session_id"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type Analytics = typeof analytics.$inferSelect;
 
 // Keep existing users table for compatibility
 export const users = pgTable("users", {

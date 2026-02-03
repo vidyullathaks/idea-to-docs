@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AboutDialog } from "@/components/about-dialog";
 
 export function Header() {
   return (
@@ -14,7 +15,10 @@ export function Header() {
             <p className="text-xs text-muted-foreground">AI PRD Generator</p>
           </div>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <AboutDialog />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
