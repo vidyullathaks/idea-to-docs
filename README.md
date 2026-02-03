@@ -1,4 +1,4 @@
-# **IdeaForge — AI PRD Generator**  
+# **IdeaForge - AI PRD Generator**  
 Turn raw product ideas into complete, structured Product Requirements Documents (PRDs) with user stories and acceptance criteria.
 
 ---
