@@ -137,7 +137,11 @@ idea-to-docs/
 
 ## 🖼️ **Screenshots**
 
+### Landing Page
+
 <img width="3588" height="2066" alt="image" src="https://github.com/user-attachments/assets/9d154743-e5ab-4458-965d-e824f70e090c" />
+
+### Example: Generated PRD for "Designed and shipped an AI-powered habit coaching system with automated check-ins and personalized feedback"
 
 <img width="3594" height="2070" alt="image" src="https://github.com/user-attachments/assets/f390edac-6c76-4e80-b9fd-47e9ab352bcf" />
 
