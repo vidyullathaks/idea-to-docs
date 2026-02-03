@@ -1,38 +1,42 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import { prds, type Prd, type InsertPrd } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getAllPrds(): Promise<Prd[]>;
+  getPrd(id: number): Promise<Prd | undefined>;
+  createPrd(data: InsertPrd): Promise<Prd>;
+  updatePrd(id: number, data: Partial<InsertPrd>): Promise<Prd | undefined>;
+  deletePrd(id: number): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class PrdStorage implements IStorage {
+  async getAllPrds(): Promise<Prd[]> {
+    return db.select().from(prds).orderBy(desc(prds.createdAt));
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getPrd(id: number): Promise<Prd | undefined> {
+    const [prd] = await db.select().from(prds).where(eq(prds.id, id));
+    return prd;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createPrd(data: InsertPrd): Promise<Prd> {
+    const [prd] = await db.insert(prds).values(data).returning();
+    return prd;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async updatePrd(id: number, data: Partial<InsertPrd>): Promise<Prd | undefined> {
+    const [prd] = await db
+      .update(prds)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(prds.id, id))
+      .returning();
+    return prd;
+  }
+
+  async deletePrd(id: number): Promise<void> {
+    await db.delete(prds).where(eq(prds.id, id));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new PrdStorage();
