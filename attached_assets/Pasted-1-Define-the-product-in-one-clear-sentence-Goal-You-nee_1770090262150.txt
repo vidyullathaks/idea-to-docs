@@ -1,0 +1,253 @@
+1. Define the product in one clear sentence
+Goal: You need a crisp one-liner you can reuse in resume, portfolio, and LinkedIn.
+
+Do this:
+
+Write this down (and tweak if you like):  
+“An AI-powered tool that turns rough product ideas into structured PRDs, user stories, and acceptance criteria.”
+
+That’s your north star.
+
+2. Decide what the first version will do
+Don’t build everything. Version 1 should be tiny but impressive.
+
+For v1, your app will:
+
+Input:
+
+A text box where the user types a product idea (e.g., “An app that helps students manage homework.”)
+
+Output (AI-generated):
+
+Problem statement
+
+Target users
+
+Key features
+
+User stories
+
+Acceptance criteria
+
+Later you can add: risks, metrics, edge cases, etc.—but not now.
+
+3. Sketch the user flow (PM thinking)
+You’re a PM, so think in flows, not code.
+
+User flow v1:
+
+User lands on a simple page with:
+
+Title: “AI Product Requirements Generator”
+
+Subtitle: “Turn your idea into a structured PRD.”
+
+One big text box: “Describe your product idea…”
+
+A button: “Generate PRD”
+
+User clicks the button.
+
+Backend sends the idea + a prompt to an LLM.
+
+LLM returns a structured PRD.
+
+Frontend displays it nicely (sections, headings).
+
+Optional: “Copy as Markdown” button.
+
+That’s it. Clean and focused.
+
+4. Set up your Replit project
+Step-by-step:
+
+Go to Replit and create a new Repl.
+
+Choose a stack you’re comfortable “vibe coding” in with Claude:
+
+Easiest: Python + Flask or Node.js  + Express.
+
+Name it something like: ai-prd-generator.
+
+You now have:
+
+A backend server file
+
+A place to add frontend (HTML/CSS/JS)
+
+A URL Replit will host for you
+
+5. Design the prompt for the AI (the core of the product)
+This is the heart of your app—the “product brain.”
+
+Create a prompt template like:
+
+You are an expert product manager.
+Take the following product idea and generate a structured PRD.
+
+Product idea:
+{{user_idea}}
+
+Output the PRD with the following sections:
+
+Problem Statement
+
+Target Users
+
+Goals & Non-Goals
+
+Key Features
+
+User Stories (as bullet points)
+
+Acceptance Criteria (as bullet points)
+
+You’ll send this prompt + the user’s idea to the LLM API.
+
+Use Claude, OpenAI, or any LLM you prefer—Claude Code can help you write the integration code.
+
+6. Build the backend API
+You’ll create one endpoint: /generate-prd.
+
+Rough steps (you can have Claude Code write the actual code):
+
+Backend does:
+
+Receives a POST request with JSON: { idea: "..." }
+
+Builds the full prompt using your template.
+
+Calls the LLM API with that prompt.
+
+Gets the response text.
+
+Sends it back to the frontend as JSON: { prd: "..." }
+
+Ask Claude Code:
+“Write a Flask/Express endpoint called /generate-prd that takes a JSON body with idea and calls [chosen LLM] with this prompt: [paste prompt].”
+
+Let it generate and refine until it works.
+
+7. Build the frontend (simple but clean)
+You don’t need anything fancy—just something that looks intentional.
+
+Frontend pieces:
+
+Elements:
+
+Title + subtitle
+
+Textarea for idea
+
+“Generate PRD” button
+
+Loading indicator (“Generating…”)
+
+Output area with sections styled nicely
+
+Logic:
+
+On button click:
+
+Disable button
+
+Show “Generating…”
+
+Send fetch('/generate-prd', { method: 'POST', body: JSON.stringify({ idea }) })
+
+When response comes back:
+
+Show the PRD text
+
+Re-enable button
+
+Ask Claude Code:
+“Generate a simple HTML/CSS/JS frontend that calls /generate-prd and displays the result nicely.”
+
+8. Make it feel like a real product (not a toy)
+This is where you stand out as a PM.
+
+Add:
+
+Empty state text:  
+“Describe your product idea in 3–5 sentences for best results.”
+
+Helper examples:
+
+“An app that helps remote teams track daily priorities.”
+
+“A tool for teachers to assign and grade homework automatically.”
+
+Small note:  
+“AI-generated. Review and edit before sharing.”
+
+This shows you understand UX and responsible AI.
+
+9. Add a tiny bit of analytics (optional but powerful)
+Even a simple log makes you look like a PM who cares about usage.
+
+Log each request on the backend:
+
+Timestamp
+
+Idea length
+
+Maybe a random session ID
+
+You don’t need a full dashboard—just show in your case study that you thought about tracking.
+
+10. Polish for portfolio and bragging rights
+Once it works end-to-end:
+
+Do this:
+
+Give it a name:
+
+“SpecSmith”
+
+“PRD Genie”
+
+“Idea → PRD”
+
+Add a tiny logo or text logo.
+
+Write a short “About” section on the page:
+
+What it does
+
+Who it’s for (PMs, founders, students)
+
+How to use it
+
+Now it feels like a product, not a demo.
+
+11. Document it like a PM case study
+This is where you turn “I built a thing” into “I’m an AI PM.”
+
+Create a Notion page or PDF with:
+
+Problem:  
+PMs and founders struggle to turn fuzzy ideas into structured PRDs quickly.
+
+Users:  
+Early-stage founders, junior PMs, students.
+
+Solution:  
+AI tool that generates PRDs from natural language ideas.
+
+Scope of v1:  
+One input, one output, fixed structure.
+
+Architecture:  
+Replit-hosted web app + backend + LLM API.
+
+Prompt design:  
+Show your prompt and how you iterated.
+
+Limitations & next steps:
+
+No collaboration yet
+
+No editing inside the tool
+
+Future: save PRDs, export to Notion/Jira, multi-language, etc.
