@@ -4,6 +4,11 @@
 IdeaForge is an AI-powered tool that transforms rough product ideas into structured Product Requirements Documents (PRDs), user stories, and acceptance criteria. Built with a modern React frontend and Express backend, powered by OpenAI's GPT-5.2 model.
 
 ## Recent Changes
+- **2026-02-03**: Added analytics, About section, AI disclaimer, and export options
+  - Analytics table tracks PRD generation time, idea length, and export events
+  - About dialog with app description, target users, usage instructions, and live stats
+  - AI disclaimer warning alert at bottom of PRD display
+  - Notion/Jira export buttons (placeholder prompts) with analytics logging
 - **2026-02-03**: Initial MVP implementation
   - Created PRD data model with user stories and acceptance criteria
   - Built beautiful React UI with theme support
