@@ -159,6 +159,11 @@ idea-to-docs/
 
 ---
 
+## 🧩 Development Approach
+This project was built using a combination of traditional development and AI‑assisted coding workflows on Replit. Leveraging Replit’s AI tools enabled rapid prototyping and allowed me to focus on product strategy, UX, and prompt engineering while still maintaining full ownership of the architecture and implementation.
+
+---
+
 ## 👤 **Author**
 
 Built by **Vidyullatha**, aspiring AI Product Manager.  
