@@ -418,6 +418,238 @@ export async function registerRoutes(
     }
   });
 
+  // ========== Tool Results CRUD ==========
+
+  app.get("/api/tool-results", async (req, res) => {
+    try {
+      const toolType = req.query.toolType as string | undefined;
+      const results = await storage.getAllToolResults(toolType);
+      res.json(results);
+    } catch (error) {
+      console.error("Error fetching tool results:", error);
+      res.status(500).json({ message: "Failed to fetch tool results" });
+    }
+  });
+
+  app.get("/api/tool-results/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+      const result = await storage.getToolResult(id);
+      if (!result) return res.status(404).json({ message: "Tool result not found" });
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching tool result:", error);
+      res.status(500).json({ message: "Failed to fetch tool result" });
+    }
+  });
+
+  app.get("/api/shared/tool/:shareId", async (req, res) => {
+    try {
+      const result = await storage.getToolResultByShareId(req.params.shareId);
+      if (!result) return res.status(404).json({ message: "Shared result not found" });
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching shared tool result:", error);
+      res.status(500).json({ message: "Failed to fetch shared result" });
+    }
+  });
+
+  app.patch("/api/tool-results/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+
+      const current = await storage.getToolResult(id);
+      if (!current) return res.status(404).json({ message: "Tool result not found" });
+
+      const { id: _id, createdAt, updatedAt, ...snapshot } = current;
+      await storage.createToolResultVersion({
+        toolResultId: id,
+        snapshot: snapshot as Record<string, unknown>,
+        changeSummary: `Edited result`,
+      });
+
+      const updated = await storage.updateToolResult(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating tool result:", error);
+      res.status(500).json({ message: "Failed to update tool result" });
+    }
+  });
+
+  app.delete("/api/tool-results/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+      await storage.deleteToolResult(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting tool result:", error);
+      res.status(500).json({ message: "Failed to delete tool result" });
+    }
+  });
+
+  app.post("/api/tool-results/:id/share", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+      const shareId = await storage.generateToolResultShareId(id);
+      res.json({ shareId });
+    } catch (error) {
+      console.error("Error generating share link:", error);
+      res.status(500).json({ message: "Failed to generate share link" });
+    }
+  });
+
+  app.get("/api/tool-results/:id/versions", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+      const versions = await storage.getToolResultVersions(id);
+      res.json(versions);
+    } catch (error) {
+      console.error("Error fetching versions:", error);
+      res.status(500).json({ message: "Failed to fetch version history" });
+    }
+  });
+
+  app.post("/api/tool-results/:id/versions/:versionId/restore", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const versionId = parseInt(req.params.versionId);
+      if (isNaN(id) || isNaN(versionId)) return res.status(400).json({ message: "Invalid ID" });
+
+      const versions = await storage.getToolResultVersions(id);
+      const version = versions.find(v => v.id === versionId);
+      if (!version) return res.status(404).json({ message: "Version not found" });
+
+      const current = await storage.getToolResult(id);
+      if (!current) return res.status(404).json({ message: "Tool result not found" });
+
+      const { id: _id, createdAt, updatedAt, ...currentSnapshot } = current;
+      await storage.createToolResultVersion({
+        toolResultId: id,
+        snapshot: currentSnapshot as Record<string, unknown>,
+        changeSummary: "Before restore",
+      });
+
+      const snapshot = version.snapshot as Record<string, unknown>;
+      const updated = await storage.updateToolResult(id, {
+        title: snapshot.title as string,
+        rawInput: snapshot.rawInput as string,
+        result: snapshot.result as Record<string, unknown>,
+      });
+
+      res.json(updated);
+    } catch (error) {
+      console.error("Error restoring version:", error);
+      res.status(500).json({ message: "Failed to restore version" });
+    }
+  });
+
+  // ========== Tool Generation (saves to DB) ==========
+
+  app.post("/api/tools/user-stories/generate", async (req, res) => {
+    try {
+      const validation = userStoryInputSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await generateUserStories(validation.data.featureIdea);
+      const saved = await storage.createToolResult({
+        toolType: "user-stories",
+        title: result.featureName || "User Stories",
+        rawInput: validation.data.featureIdea,
+        result: result as unknown as Record<string, unknown>,
+      });
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error generating user stories:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to generate user stories" });
+    }
+  });
+
+  app.post("/api/tools/refine-problem/generate", async (req, res) => {
+    try {
+      const validation = problemSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await refineProblemStatement(validation.data.problem);
+      const saved = await storage.createToolResult({
+        toolType: "problem-refiner",
+        title: "Refined Problem Statement",
+        rawInput: validation.data.problem,
+        result: result as unknown as Record<string, unknown>,
+      });
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error refining problem:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to refine problem statement" });
+    }
+  });
+
+  app.post("/api/tools/prioritize-features/generate", async (req, res) => {
+    try {
+      const validation = featuresSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await prioritizeFeatures(validation.data.features);
+      const saved = await storage.createToolResult({
+        toolType: "feature-prioritizer",
+        title: "Feature Prioritization",
+        rawInput: validation.data.features.join(", "),
+        result: result as unknown as Record<string, unknown>,
+      });
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error prioritizing features:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to prioritize features" });
+    }
+  });
+
+  app.post("/api/tools/plan-sprint/generate", async (req, res) => {
+    try {
+      const validation = sprintSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await planSprint(validation.data.backlog);
+      const saved = await storage.createToolResult({
+        toolType: "sprint-planner",
+        title: result.sprintGoal || "Sprint Plan",
+        rawInput: validation.data.backlog,
+        result: result as unknown as Record<string, unknown>,
+      });
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error planning sprint:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to plan sprint" });
+    }
+  });
+
+  app.post("/api/tools/interview-prep/generate", async (req, res) => {
+    try {
+      const validation = interviewSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await prepareInterviewAnswer(validation.data.question);
+      const saved = await storage.createToolResult({
+        toolType: "interview-prep",
+        title: result.question || "Interview Prep",
+        rawInput: validation.data.question,
+        result: result as unknown as Record<string, unknown>,
+      });
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error preparing interview answer:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to prepare interview answer" });
+    }
+  });
+
   const rewriteSchema = z.object({
     sectionName: z.string().min(1),
     currentContent: z.string().min(1),

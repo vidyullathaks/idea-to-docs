@@ -20,7 +20,10 @@ import {
 } from "@/pages/tool-pages";
 import ComparePrdsPage from "@/pages/compare-prds";
 import SharedPrd from "@/pages/shared-prd";
+import SharedToolResult from "@/pages/shared-tool-result";
 import TemplatesPage from "@/pages/templates";
+import ToolResultsPage from "@/pages/tool-results";
+import ToolResultDetail from "@/pages/tool-result-detail";
 
 function Router() {
   return (
@@ -34,7 +37,10 @@ function Router() {
       <Route path="/interview-prep" component={InterviewPrep} />
       <Route path="/compare" component={ComparePrdsPage} />
       <Route path="/share/:shareId" component={SharedPrd} />
+      <Route path="/share/tool/:shareId" component={SharedToolResult} />
       <Route path="/templates" component={TemplatesPage} />
+      <Route path="/tool-results" component={ToolResultsPage} />
+      <Route path="/tool-results/:id" component={ToolResultDetail} />
       <Route component={NotFound} />
     </Switch>
   );

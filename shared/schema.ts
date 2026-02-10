@@ -73,6 +73,42 @@ export const insertCustomTemplateSchema = createInsertSchema(customTemplates).om
 export type InsertCustomTemplate = z.infer<typeof insertCustomTemplateSchema>;
 export type CustomTemplate = typeof customTemplates.$inferSelect;
 
+export const toolResults = pgTable("tool_results", {
+  id: serial("id").primaryKey(),
+  toolType: text("tool_type").notNull(),
+  title: text("title").notNull(),
+  rawInput: text("raw_input").notNull(),
+  result: jsonb("result").$type<Record<string, unknown>>().notNull(),
+  shareId: text("share_id").unique(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertToolResultSchema = createInsertSchema(toolResults).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertToolResult = z.infer<typeof insertToolResultSchema>;
+export type ToolResult = typeof toolResults.$inferSelect;
+
+export const toolResultVersions = pgTable("tool_result_versions", {
+  id: serial("id").primaryKey(),
+  toolResultId: integer("tool_result_id").notNull(),
+  snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+  changeSummary: text("change_summary"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertToolResultVersionSchema = createInsertSchema(toolResultVersions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertToolResultVersion = z.infer<typeof insertToolResultVersionSchema>;
+export type ToolResultVersion = typeof toolResultVersions.$inferSelect;
+
 export const analytics = pgTable("analytics", {
   id: serial("id").primaryKey(),
   eventType: text("event_type").notNull(),

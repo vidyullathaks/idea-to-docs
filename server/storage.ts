@@ -4,6 +4,8 @@ import {
   analytics,
   prdVersions,
   customTemplates,
+  toolResults,
+  toolResultVersions,
   type Prd,
   type InsertPrd,
   type InsertAnalytics,
@@ -12,6 +14,10 @@ import {
   type InsertPrdVersion,
   type CustomTemplate,
   type InsertCustomTemplate,
+  type ToolResult,
+  type InsertToolResult,
+  type ToolResultVersion,
+  type InsertToolResultVersion,
 } from "@shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import crypto from "crypto";
@@ -31,6 +37,15 @@ export interface IStorage {
   deleteTemplate(id: number): Promise<void>;
   logAnalytics(data: InsertAnalytics): Promise<Analytics>;
   getAnalyticsSummary(): Promise<{ totalPrds: number; totalGenerations: number; avgGenerationTime: number }>;
+  getAllToolResults(toolType?: string): Promise<ToolResult[]>;
+  getToolResult(id: number): Promise<ToolResult | undefined>;
+  getToolResultByShareId(shareId: string): Promise<ToolResult | undefined>;
+  createToolResult(data: InsertToolResult): Promise<ToolResult>;
+  updateToolResult(id: number, data: Partial<InsertToolResult>): Promise<ToolResult | undefined>;
+  deleteToolResult(id: number): Promise<void>;
+  generateToolResultShareId(id: number): Promise<string>;
+  createToolResultVersion(data: InsertToolResultVersion): Promise<ToolResultVersion>;
+  getToolResultVersions(toolResultId: number): Promise<ToolResultVersion[]>;
 }
 
 export class PrdStorage implements IStorage {
@@ -119,6 +134,61 @@ export class PrdStorage implements IStorage {
       totalGenerations: Number(genStats?.count || 0),
       avgGenerationTime: Math.round(Number(genStats?.avgTime || 0)),
     };
+  }
+
+  async getAllToolResults(toolType?: string): Promise<ToolResult[]> {
+    if (toolType) {
+      return db.select().from(toolResults).where(eq(toolResults.toolType, toolType)).orderBy(desc(toolResults.createdAt));
+    }
+    return db.select().from(toolResults).orderBy(desc(toolResults.createdAt));
+  }
+
+  async getToolResult(id: number): Promise<ToolResult | undefined> {
+    const [result] = await db.select().from(toolResults).where(eq(toolResults.id, id));
+    return result;
+  }
+
+  async getToolResultByShareId(shareId: string): Promise<ToolResult | undefined> {
+    const [result] = await db.select().from(toolResults).where(eq(toolResults.shareId, shareId));
+    return result;
+  }
+
+  async createToolResult(data: InsertToolResult): Promise<ToolResult> {
+    const [result] = await db.insert(toolResults).values(data).returning();
+    return result;
+  }
+
+  async updateToolResult(id: number, data: Partial<InsertToolResult>): Promise<ToolResult | undefined> {
+    const [result] = await db
+      .update(toolResults)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(toolResults.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteToolResult(id: number): Promise<void> {
+    await db.delete(toolResultVersions).where(eq(toolResultVersions.toolResultId, id));
+    await db.delete(toolResults).where(eq(toolResults.id, id));
+  }
+
+  async generateToolResultShareId(id: number): Promise<string> {
+    const result = await this.getToolResult(id);
+    if (!result) throw new Error("Tool result not found");
+    if (result.shareId) return result.shareId;
+
+    const shareId = crypto.randomBytes(8).toString("hex");
+    await db.update(toolResults).set({ shareId }).where(eq(toolResults.id, id));
+    return shareId;
+  }
+
+  async createToolResultVersion(data: InsertToolResultVersion): Promise<ToolResultVersion> {
+    const [version] = await db.insert(toolResultVersions).values(data).returning();
+    return version;
+  }
+
+  async getToolResultVersions(toolResultId: number): Promise<ToolResultVersion[]> {
+    return db.select().from(toolResultVersions).where(eq(toolResultVersions.toolResultId, toolResultId)).orderBy(desc(toolResultVersions.createdAt));
   }
 }
 

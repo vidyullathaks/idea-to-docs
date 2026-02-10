@@ -4,6 +4,14 @@
 IdeaForge is a comprehensive AI-powered PM toolkit with 7+ tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
 
 ## Recent Changes
+- **2026-02-10**: Extended production features to ALL 5 AI tools
+  - Created tool_results and tool_result_versions database tables for persistent storage
+  - Built reusable ToolResultDisplay component with inline editing, version history, shareable links, and export
+  - All 5 tool pages now save results to DB on generation
+  - Added Tool Results History page (/tool-results) with view/delete
+  - Added Tool Result Detail page (/tool-results/:id) for individual viewing
+  - Added Shared Tool Result page (/share/tool/:shareId) for read-only sharing
+  - Sidebar updated with "Tool Results" link
 - **2026-02-10**: Production features implementation
   - Inline editing: Click pencil icon on any PRD section to edit directly, with Save/Cancel
   - Version history: Every edit creates a snapshot; view and restore past versions via History dialog

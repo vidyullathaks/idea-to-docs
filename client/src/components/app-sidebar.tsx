@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   FolderOpen,
   Palette,
+  ClipboardList,
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +33,7 @@ const tools = [
   { title: "Feature Prioritizer", url: "/prioritization", icon: BarChart3 },
   { title: "Sprint Planner", url: "/sprint-planning", icon: Calendar },
   { title: "Interview Prep", url: "/interview-prep", icon: GraduationCap },
+  { title: "Tool Results", url: "/tool-results", icon: ClipboardList },
   { title: "Templates", url: "/templates", icon: Palette },
 ];
 
