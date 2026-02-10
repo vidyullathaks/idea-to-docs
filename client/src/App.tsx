@@ -18,7 +18,9 @@ import {
   SprintPlanner,
   InterviewPrep,
 } from "@/pages/tool-pages";
-import ComparePrds from "@/pages/compare-prds";
+import ComparePrdsPage from "@/pages/compare-prds";
+import SharedPrd from "@/pages/shared-prd";
+import TemplatesPage from "@/pages/templates";
 
 function Router() {
   return (
@@ -30,7 +32,9 @@ function Router() {
       <Route path="/prioritization" component={FeaturePrioritizer} />
       <Route path="/sprint-planning" component={SprintPlanner} />
       <Route path="/interview-prep" component={InterviewPrep} />
-      <Route path="/compare" component={ComparePrds} />
+      <Route path="/compare" component={ComparePrdsPage} />
+      <Route path="/share/:shareId" component={SharedPrd} />
+      <Route path="/templates" component={TemplatesPage} />
       <Route component={NotFound} />
     </Switch>
   );

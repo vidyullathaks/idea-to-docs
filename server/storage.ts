@@ -1,13 +1,34 @@
 import { db } from "./db";
-import { prds, analytics, type Prd, type InsertPrd, type InsertAnalytics, type Analytics } from "@shared/schema";
+import {
+  prds,
+  analytics,
+  prdVersions,
+  customTemplates,
+  type Prd,
+  type InsertPrd,
+  type InsertAnalytics,
+  type Analytics,
+  type PrdVersion,
+  type InsertPrdVersion,
+  type CustomTemplate,
+  type InsertCustomTemplate,
+} from "@shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
+import crypto from "crypto";
 
 export interface IStorage {
   getAllPrds(): Promise<Prd[]>;
   getPrd(id: number): Promise<Prd | undefined>;
+  getPrdByShareId(shareId: string): Promise<Prd | undefined>;
   createPrd(data: InsertPrd): Promise<Prd>;
   updatePrd(id: number, data: Partial<InsertPrd>): Promise<Prd | undefined>;
   deletePrd(id: number): Promise<void>;
+  generateShareId(id: number): Promise<string>;
+  createVersion(data: InsertPrdVersion): Promise<PrdVersion>;
+  getVersionsByPrdId(prdId: number): Promise<PrdVersion[]>;
+  getAllTemplates(): Promise<CustomTemplate[]>;
+  createTemplate(data: InsertCustomTemplate): Promise<CustomTemplate>;
+  deleteTemplate(id: number): Promise<void>;
   logAnalytics(data: InsertAnalytics): Promise<Analytics>;
   getAnalyticsSummary(): Promise<{ totalPrds: number; totalGenerations: number; avgGenerationTime: number }>;
 }
@@ -19,6 +40,11 @@ export class PrdStorage implements IStorage {
 
   async getPrd(id: number): Promise<Prd | undefined> {
     const [prd] = await db.select().from(prds).where(eq(prds.id, id));
+    return prd;
+  }
+
+  async getPrdByShareId(shareId: string): Promise<Prd | undefined> {
+    const [prd] = await db.select().from(prds).where(eq(prds.shareId, shareId));
     return prd;
   }
 
@@ -37,7 +63,40 @@ export class PrdStorage implements IStorage {
   }
 
   async deletePrd(id: number): Promise<void> {
+    await db.delete(prdVersions).where(eq(prdVersions.prdId, id));
     await db.delete(prds).where(eq(prds.id, id));
+  }
+
+  async generateShareId(id: number): Promise<string> {
+    const prd = await this.getPrd(id);
+    if (!prd) throw new Error("PRD not found");
+    if (prd.shareId) return prd.shareId;
+
+    const shareId = crypto.randomBytes(8).toString("hex");
+    await db.update(prds).set({ shareId }).where(eq(prds.id, id));
+    return shareId;
+  }
+
+  async createVersion(data: InsertPrdVersion): Promise<PrdVersion> {
+    const [version] = await db.insert(prdVersions).values(data).returning();
+    return version;
+  }
+
+  async getVersionsByPrdId(prdId: number): Promise<PrdVersion[]> {
+    return db.select().from(prdVersions).where(eq(prdVersions.prdId, prdId)).orderBy(desc(prdVersions.createdAt));
+  }
+
+  async getAllTemplates(): Promise<CustomTemplate[]> {
+    return db.select().from(customTemplates).orderBy(desc(customTemplates.createdAt));
+  }
+
+  async createTemplate(data: InsertCustomTemplate): Promise<CustomTemplate> {
+    const [template] = await db.insert(customTemplates).values(data).returning();
+    return template;
+  }
+
+  async deleteTemplate(id: number): Promise<void> {
+    await db.delete(customTemplates).where(eq(customTemplates.id, id));
   }
 
   async logAnalytics(data: InsertAnalytics): Promise<Analytics> {

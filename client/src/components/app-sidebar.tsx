@@ -9,6 +9,7 @@ import {
   Sparkles,
   ArrowLeftRight,
   FolderOpen,
+  Palette,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ const tools = [
   { title: "Feature Prioritizer", url: "/prioritization", icon: BarChart3 },
   { title: "Sprint Planner", url: "/sprint-planning", icon: Calendar },
   { title: "Interview Prep", url: "/interview-prep", icon: GraduationCap },
+  { title: "Templates", url: "/templates", icon: Palette },
 ];
 
 export function AppSidebar() {

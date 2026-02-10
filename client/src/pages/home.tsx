@@ -28,6 +28,8 @@ import {
   Lock,
   ExternalLink,
   Globe,
+  Pencil,
+  CheckCircle2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,14 +49,17 @@ const templates = [
   },
 ];
 
+const liveFeatures = [
+  { icon: Download, label: "Export as PDF or Markdown" },
+  { icon: Pencil, label: "Inline editing with version history" },
+  { icon: Link2, label: "Shareable links" },
+  { icon: Palette, label: "Custom templates" },
+];
+
 const roadmapItems = [
-  { icon: Download, label: "Export as PDF or Markdown", status: "coming-soon" as const },
   { icon: Users, label: "Collaborative editing", status: "planned" as const },
-  { icon: History, label: "Version history", status: "planned" as const },
-  { icon: Palette, label: "Custom templates", status: "planned" as const },
-  { icon: Cpu, label: "Multi-model support", status: "planned" as const },
+  { icon: Cpu, label: "Multi-model support", status: "coming-soon" as const },
   { icon: UserCircle, label: "User accounts + cloud sync", status: "planned" as const },
-  { icon: Link2, label: "Shareable links", status: "planned" as const },
   { icon: ExternalLink, label: "Export to Notion / Jira", status: "planned" as const },
   { icon: Globe, label: "Multi-language support", status: "planned" as const },
 ];
@@ -198,10 +203,29 @@ export default function Home() {
               </div>
             )}
 
-            <section className="border-t border-border/50 pt-8" data-testid="section-roadmap">
+            <section className="border-t border-border/50 pt-8" data-testid="section-features">
               <div className="text-center mb-6">
-                <h2 className="text-lg font-semibold" data-testid="text-roadmap-header">Coming Soon</h2>
-                <p className="text-sm text-muted-foreground mt-1">Features we're working on next</p>
+                <h2 className="text-lg font-semibold" data-testid="text-features-header">What You Can Do</h2>
+                <p className="text-sm text-muted-foreground mt-1">Recently shipped features</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {liveFeatures.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-3 p-3 rounded-md border border-primary/20 bg-primary/5"
+                    data-testid={`feature-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                      <item.icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium flex-1">{item.label}</span>
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-8 mb-4">
+                <h3 className="text-sm font-semibold text-muted-foreground">Coming Soon</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {roadmapItems.map((item) => (
@@ -219,13 +243,6 @@ export default function Home() {
                     </Badge>
                   </div>
                 ))}
-              </div>
-              <div className="text-xs text-muted-foreground text-center mt-4 space-y-1">
-                <p>
-                  <Lock className="inline h-3 w-3 mr-1" />
-                  Current limitations: No collaboration yet, no editing inside the tool.
-                </p>
-                <p>PRDs are saved to your session. Cloud sync, Notion/Jira export, and multi-language support are coming.</p>
               </div>
             </section>
           </div>

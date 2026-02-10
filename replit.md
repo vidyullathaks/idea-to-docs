@@ -1,14 +1,21 @@
 # IdeaForge - AI-Powered PM Toolkit
 
 ## Overview
-IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
+IdeaForge is a comprehensive AI-powered PM toolkit with 7+ tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
 
 ## Recent Changes
+- **2026-02-10**: Production features implementation
+  - Inline editing: Click pencil icon on any PRD section to edit directly, with Save/Cancel
+  - Version history: Every edit creates a snapshot; view and restore past versions via History dialog
+  - Shareable links: Generate unique share URLs (/share/:shareId) for read-only PRD sharing
+  - Custom templates: Create, manage, and reuse custom templates at /templates
+  - PDF & Markdown export: Download PRDs as markdown files or print-to-PDF
+  - AI Rewrite: Use RotateCcw icon to AI-rewrite individual sections with custom instructions
+  - Updated home page: "What You Can Do" section showing shipped features + "Coming Soon" for planned items
+  - Database tables: prd_versions, custom_templates added; share_id column on prds
 - **2026-02-10**: Landing page restructure and roadmap
   - Reduced templates to 2 on home page (SaaS, Mobile)
   - Moved PRD history to dedicated /prds page with "View Your PRDs" button
-  - Added "Coming Soon" roadmap section with 9 planned features
-  - Added "Your PRDs" link in sidebar navigation
   - Home page now focuses on the input form with less scrolling
 - **2026-02-10**: Major expansion from PRD Generator to full PM Toolkit
   - Added 5 new AI-powered tools: User Story Generator, Problem Refiner, Feature Prioritizer (RICE), Sprint Planner, Interview Prep
@@ -16,12 +23,10 @@ IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help produc
   - Added PRD templates (SaaS, Mobile, E-commerce, Developer Tool, Content Platform)
   - Added "Rewrite This Section" AI editing for individual PRD sections
   - Added Compare PRDs side-by-side view with diff badges
-  - Updated About dialog with full toolkit description
-- **2026-02-03**: Added hero section and UX improvements
 - **2026-02-03**: Initial MVP with PRD Generator, analytics, exports, dark/light theme
 
 ## Tech Stack
-- **Frontend**: React 18, TypeScript, TailwindCSS, Shadcn/ui, wouter
+- **Frontend**: React 18, TypeScript, TailwindCSS, Shadcn/ui, wouter, date-fns
 - **Backend**: Express.js, TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
 - **AI**: OpenAI GPT-5.2 via Replit AI Integrations
@@ -33,28 +38,29 @@ IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help produc
 ├── client/src/
 │   ├── components/
 │   │   ├── ui/                    # Shadcn base components
-│   │   ├── app-sidebar.tsx        # Sidebar navigation with 7 tools
+│   │   ├── app-sidebar.tsx        # Sidebar navigation with tools + templates
 │   │   ├── idea-input-form.tsx    # PRD idea input with template support
-│   │   ├── prd-display.tsx        # PRD viewer with rewrite dialog
-│   │   ├── prd-list.tsx           # PRD list component (used on /prds page)
+│   │   ├── prd-display.tsx        # PRD viewer with inline editing, version history, sharing, export
 │   │   ├── loading-prd.tsx        # Generation loading state
 │   │   ├── about-dialog.tsx       # About dialog with toolkit info
 │   │   └── theme-*.tsx            # Theme provider and toggle
 │   ├── pages/
-│   │   ├── home.tsx               # Landing page with input, 2 templates, roadmap
-│   │   ├── prds.tsx               # PRD history page (view/delete PRDs)
+│   │   ├── home.tsx               # Landing page with input, templates, features/roadmap
+│   │   ├── prds.tsx               # PRD history page (view/delete/edit PRDs)
+│   │   ├── templates.tsx          # Custom templates CRUD page
+│   │   ├── shared-prd.tsx         # Read-only shared PRD view (/share/:shareId)
 │   │   ├── tool-pages.tsx         # 5 AI tools (User Stories, Problem Refiner, etc.)
 │   │   └── compare-prds.tsx       # Compare PRDs side-by-side
 │   └── lib/
 │       └── queryClient.ts         # TanStack Query setup
 ├── server/
 │   ├── db.ts                      # Database connection
-│   ├── storage.ts                 # PRD CRUD operations
-│   ├── routes.ts                  # API endpoints (PRDs + 5 AI tools)
-│   ├── openai.ts                  # AI generation (7 functions)
+│   ├── storage.ts                 # PRD, version, template CRUD operations
+│   ├── routes.ts                  # API endpoints (PRDs + tools + templates + versions + sharing)
+│   ├── openai.ts                  # AI generation (7 functions, optional model param)
 │   └── seed.ts                    # Sample data seeding
 └── shared/
-    └── schema.ts                  # Drizzle schema & types
+    └── schema.ts                  # Drizzle schema & types (prds, prd_versions, custom_templates, analytics, users)
 ```
 
 ### PM Tools
@@ -67,39 +73,50 @@ IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help produc
 7. **Compare PRDs** (/compare) — Side-by-side PRD comparison with diff badges
 
 ### PRD Enhancement Features
-- **Templates**: 5 pre-built starting points (SaaS, Mobile, E-commerce, Developer Tool, Content Platform)
-- **Rewrite Section**: AI-powered editing of individual PRD sections with custom instructions
-- **Compare**: Side-by-side comparison of any two PRDs with count differences
+- **Inline Editing**: Click pencil icon on any section to edit directly with Save/Cancel
+- **AI Rewrite**: RotateCcw icon triggers AI-powered rewriting with custom instructions
+- **Version History**: Automatic snapshots on every edit; view/restore via History dialog
+- **Shareable Links**: Generate unique URLs for read-only PRD sharing
+- **Export**: Copy as markdown, download as .md file, or print to PDF
+- **Custom Templates**: Create/manage reusable product idea templates at /templates
 
 ### API Endpoints
 - `GET /api/prds` — List all PRDs
 - `GET /api/prds/:id` — Get single PRD
-- `POST /api/prds/generate` — Generate new PRD from idea
-- `DELETE /api/prds/:id` — Delete PRD
-- `POST /api/tools/user-stories` — Generate user stories
-- `POST /api/tools/refine-problem` — Refine problem statement
-- `POST /api/tools/prioritize-features` — RICE feature prioritization
-- `POST /api/tools/plan-sprint` — Generate sprint plan
-- `POST /api/tools/interview-prep` — PM interview prep
-- `POST /api/tools/rewrite-section` — Rewrite PRD section
+- `POST /api/prds/generate` — Generate new PRD from idea (optional model param)
+- `PATCH /api/prds/:id` — Update PRD fields (creates version snapshot)
+- `DELETE /api/prds/:id` — Delete PRD (cascades versions)
+- `POST /api/prds/:id/share` — Generate shareable link
+- `GET /api/shared/:shareId` — Get PRD by share ID (read-only)
+- `GET /api/prds/:id/versions` — Get version history
+- `POST /api/prds/:id/versions/:versionId/restore` — Restore a version
+- `GET /api/templates` — List custom templates
+- `POST /api/templates` — Create custom template
+- `DELETE /api/templates/:id` — Delete custom template
+- `GET /api/models` — List available AI models
+- `POST /api/tools/*` — Various AI tool endpoints
+- `POST /api/analytics/export` — Log export analytics
+- `GET /api/analytics/summary` — Get analytics summary
 
 ### Database Schema
 ```typescript
 prds: {
-  id: serial (PK)
-  title: text
-  rawIdea: text (required)
-  problemStatement: text
-  targetAudience: text
-  goals: text[]
-  features: text[]
-  successMetrics: text[]
-  userStories: jsonb (UserStory[])
-  outOfScope: text[]
-  assumptions: text[]
-  status: text (default: "draft")
-  createdAt: timestamp
-  updatedAt: timestamp
+  id: serial (PK), title: text, rawIdea: text (required),
+  problemStatement: text, targetAudience: text,
+  goals: text[], features: text[], successMetrics: text[],
+  userStories: jsonb (UserStory[]), outOfScope: text[], assumptions: text[],
+  status: text (default: "draft"), shareId: text (unique),
+  createdAt: timestamp, updatedAt: timestamp
+}
+
+prd_versions: {
+  id: serial (PK), prdId: integer, snapshot: jsonb,
+  changeSummary: text, createdAt: timestamp
+}
+
+custom_templates: {
+  id: serial (PK), name: text, description: text,
+  idea: text, category: text (default: "custom"), createdAt: timestamp
 }
 ```
 

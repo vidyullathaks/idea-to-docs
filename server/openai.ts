@@ -57,9 +57,9 @@ For user stories, use the format:
 
 Respond with valid JSON matching the exact structure requested. Be thorough and specific.`;
 
-export async function generatePrd(idea: string): Promise<GeneratedPrd> {
+export async function generatePrd(idea: string, model?: string): Promise<GeneratedPrd> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       { role: "system", content: systemPrompt },
       { 

@@ -1,9 +1,8 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, timestamp, jsonb, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, timestamp, jsonb, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User stories schema for JSON storage
 export const userStorySchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -14,7 +13,6 @@ export const userStorySchema = z.object({
 
 export type UserStory = z.infer<typeof userStorySchema>;
 
-// PRD documents table
 export const prds = pgTable("prds", {
   id: serial("id").primaryKey(),
   title: text("title"),
@@ -28,6 +26,7 @@ export const prds = pgTable("prds", {
   outOfScope: text("out_of_scope").array(),
   assumptions: text("assumptions").array(),
   status: text("status").notNull().default("draft"),
+  shareId: text("share_id").unique(),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -41,14 +40,46 @@ export const insertPrdSchema = createInsertSchema(prds).omit({
 export type InsertPrd = z.infer<typeof insertPrdSchema>;
 export type Prd = typeof prds.$inferSelect;
 
-// Analytics table for tracking usage
+export const prdVersions = pgTable("prd_versions", {
+  id: serial("id").primaryKey(),
+  prdId: integer("prd_id").notNull(),
+  snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+  changeSummary: text("change_summary"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertPrdVersionSchema = createInsertSchema(prdVersions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPrdVersion = z.infer<typeof insertPrdVersionSchema>;
+export type PrdVersion = typeof prdVersions.$inferSelect;
+
+export const customTemplates = pgTable("custom_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  idea: text("idea").notNull(),
+  category: text("category").default("custom"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertCustomTemplateSchema = createInsertSchema(customTemplates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCustomTemplate = z.infer<typeof insertCustomTemplateSchema>;
+export type CustomTemplate = typeof customTemplates.$inferSelect;
+
 export const analytics = pgTable("analytics", {
   id: serial("id").primaryKey(),
-  eventType: text("event_type").notNull(), // 'prd_generated', 'prd_viewed', 'prd_exported'
+  eventType: text("event_type").notNull(),
   prdId: integer("prd_id"),
   ideaLength: integer("idea_length"),
   generationTimeMs: integer("generation_time_ms"),
-  exportType: text("export_type"), // 'markdown', 'notion', 'jira'
+  exportType: text("export_type"),
   sessionId: text("session_id"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -61,7 +92,6 @@ export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 export type Analytics = typeof analytics.$inferSelect;
 
-// Keep existing users table for compatibility
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
