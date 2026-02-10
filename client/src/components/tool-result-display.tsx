@@ -648,9 +648,9 @@ function InterviewPrepView({ result, readOnly, onSaveResult }: { result: Record<
       <Card>
         <CardHeader>
           <CardTitle className="text-base" data-testid="text-question">{result.question as string}</CardTitle>
-          <CardDescription className="flex items-center gap-2 flex-wrap">
-            Framework:
-            <Badge variant="outline" className="no-default-hover-elevate" data-testid="badge-framework">{result.framework as string}</Badge>
+          <CardDescription data-testid="badge-framework">
+            <span className="font-medium">Framework:</span>{" "}
+            <span className="text-muted-foreground">{result.framework as string}</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
