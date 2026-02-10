@@ -1,141 +1,236 @@
-# **IdeaForge - AI PRD Generator**  
-Turn raw product ideas into complete, structured Product Requirements Documents (PRDs) with user stories and acceptance criteria.
+# **IdeaForge - AI-Powered PM Toolkit**
+Transform rough product ideas into complete PRDs, user stories, sprint plans, and more — powered by AI.
 
 ---
 
-## 📌 **Overview**  
-**IdeaForge** is a full‑stack AI-powered application that transforms rough product ideas into polished PRDs. It’s designed for product managers, founders, students, and teams who want to accelerate early‑stage product definition without sacrificing clarity or structure.
+## Overview
+**IdeaForge** is a full-stack AI-powered Product Management toolkit that goes beyond simple PRD generation. It provides six specialized AI tools designed for product managers, founders, students, and teams who want to accelerate product definition and planning.
 
-Users simply describe their idea, and IdeaForge generates:
+Users describe their idea, and IdeaForge generates a structured PRD containing:
 
-- Problem Statement  
-- Target Audience  
-- Goals & Objectives  
-- Key Features  
-- Success Metrics  
-- Out of Scope  
-- Assumptions  
-- User Stories with Acceptance Criteria  
+- Problem Statement
+- Target Audience
+- Goals & Objectives
+- Key Features
+- Success Metrics
+- Out of Scope
+- Assumptions
+- User Stories with Acceptance Criteria
 
-The tool is fully deployed and accessible online.
-
----
-
-## 🎯 **Why This Project Exists**  
-Writing PRDs is one of the most time‑consuming parts of product management. IdeaForge helps users:
-
-- Move from idea → structured PRD in seconds  
-- Explore multiple product directions quickly  
-- Improve clarity before involving engineering  
-- Learn how strong PRDs are structured  
-- Build confidence in product thinking  
-
-This project also demonstrates practical AI product development, prompt engineering, and full‑stack deployment.
+Beyond PRD generation, the toolkit includes five additional AI-powered tools for the full product management workflow.
 
 ---
 
-## 🧠 **Key Features**
+## Why This Project Exists
+Writing PRDs and preparing product artifacts is one of the most time-consuming parts of product management. IdeaForge helps users:
 
-### **AI‑Generated PRDs**
-A refined prompt ensures consistent, senior‑PM‑quality PRDs.
+- Move from idea to structured PRD in seconds
+- Generate user stories, refine problems, and prioritize features with AI
+- Plan sprints and prepare for PM interviews
+- Explore multiple product directions quickly
+- Improve clarity before involving engineering
+- Learn how strong product artifacts are structured
 
-### **Saved PRD Library**
-Users can generate multiple PRDs and switch between them in the sidebar.
-
-### **Clean, Modern UI**
-Built with React + Tailwind + ShadCN components for a polished, SaaS‑like feel.
-
-### **Example Ideas**
-Preloaded suggestions help users get started quickly.
-
-### **Real‑Time Rendering**
-PRDs appear instantly with structured formatting, icons, and section headers.
-
-### **AI‑Generated Content Warning**
-A built‑in disclaimer encourages users to review outputs before sharing.
+This project also demonstrates practical AI product development, prompt engineering, and full-stack deployment.
 
 ---
 
-## 🛠️ **Tech Stack**
+## Key Features
 
-### **Frontend**
-- React + TypeScript  
-- Vite  
-- TailwindCSS  
-- ShadCN UI components  
-- Custom hooks (`use-toast`, `use-mobile`)  
-- Replit integrations (audio, UI helpers)
+### PRD Generator (Core Feature)
+Input a product idea (minimum 20 characters) and receive a complete, structured PRD with all standard sections. PRDs can be edited inline, rewritten by AI, versioned, exported, and shared.
 
-### **Backend**
-- Node.js + TypeScript  
-- Express‑style routing  
-- Replit server environment  
-- OpenAI/LLM integration (`openai.ts`)  
-- Drizzle ORM for structured data  
-- SQLite (or Replit DB) for storage
+### AI-Powered PM Tools
+- **User Story Generator** — Convert feature descriptions into detailed user stories with acceptance criteria and edge cases
+- **Problem Refiner** — Turn messy problem descriptions into structured, clear problem statements
+- **Feature Prioritizer** — Evaluate features using RICE scoring with AI-generated recommendations
+- **Sprint Planner** — Transform a backlog into a sprint plan with risk assessment and recommendations
+- **Interview Prep** — Get structured answers and feedback for PM interview questions
 
-### **Infrastructure**
-- Hosted on Replit  
-- GitHub for version control  
-- Vite for bundling  
-- Drizzle for schema + migrations  
+### Inline Editing & AI Rewrite
+Click to edit any section of a PRD. Use AI to rewrite sections with custom instructions.
+
+### Version History
+Every edit creates an automatic snapshot. Browse and restore any previous version of a PRD or tool result.
+
+### Shareable Links
+Generate unique read-only URLs to share PRDs and tool results with others.
+
+### Export
+Download PRDs as Markdown or PDF.
+
+### Custom Templates
+Create, manage, and reuse product idea templates to speed up PRD generation.
+
+### Compare PRDs
+View two or more PRDs side by side for comparison.
+
+### Tool Results Library
+All AI tool outputs are saved, versioned, and shareable — just like PRDs.
+
+### Dark / Light Mode
+Toggle between dark and light themes.
+
+### Preloaded Examples
+Sample PRDs and idea templates help users get started quickly.
 
 ---
 
-## 📁 **Project Structure (Accurate to Your Repo)**
+## Tech Stack
+
+### Frontend
+- React 18 + TypeScript
+- Vite (dev server and bundler)
+- TailwindCSS + ShadCN UI (50+ components)
+- TanStack React Query (data fetching and caching)
+- Wouter (lightweight routing)
+- Framer Motion (animations)
+- React Hook Form + Zod (form handling and validation)
+- next-themes (dark mode)
+- Lucide React (icons)
+- date-fns (date utilities)
+
+### Backend
+- Node.js + Express.js 5 + TypeScript
+- Drizzle ORM (type-safe database access and migrations)
+- PostgreSQL
+- OpenAI SDK (GPT integration via Replit AI services)
+- Passport (authentication)
+- express-session (session management)
+- Zod (API input validation)
+
+### Infrastructure
+- Hosted on Replit
+- GitHub for version control
+- Vite + ESBuild for production bundling
+- Drizzle Kit for schema migrations
+
+---
+
+## Project Structure
 
 ```
 idea-to-docs/
+├── client/                        # Frontend
+│   ├── index.html                 # HTML entry point
+│   ├── public/                    # Static assets
+│   └── src/
+│       ├── main.tsx               # React entry point
+│       ├── App.tsx                # Routing and layout
+│       ├── index.css              # Global styles (light/dark themes)
+│       ├── components/
+│       │   ├── idea-input-form.tsx      # Product idea input form
+│       │   ├── prd-display.tsx          # PRD viewer (edit, version, share, export)
+│       │   ├── prd-list.tsx             # Saved PRDs list
+│       │   ├── tool-result-display.tsx  # AI tool result viewer
+│       │   ├── app-sidebar.tsx          # Navigation sidebar
+│       │   ├── header.tsx               # Page header
+│       │   ├── theme-provider.tsx       # Dark/light mode provider
+│       │   ├── theme-toggle.tsx         # Theme toggle button
+│       │   ├── about-dialog.tsx         # About modal
+│       │   ├── loading-prd.tsx          # Loading state component
+│       │   └── ui/                      # ShadCN UI primitives (50+ components)
+│       ├── pages/
+│       │   ├── home.tsx                 # Landing page with input form & templates
+│       │   ├── prds.tsx                 # PRD library
+│       │   ├── compare-prds.tsx         # Side-by-side PRD comparison
+│       │   ├── templates.tsx            # Custom template management
+│       │   ├── tool-pages.tsx           # All 5 AI tool pages
+│       │   ├── tool-results.tsx         # Tool results library
+│       │   ├── tool-result-detail.tsx   # Individual tool result viewer
+│       │   ├── shared-prd.tsx           # Read-only shared PRD view
+│       │   ├── shared-tool-result.tsx   # Read-only shared tool result view
+│       │   └── not-found.tsx            # 404 page
+│       ├── hooks/
+│       │   ├── use-toast.ts             # Toast notifications
+│       │   └── use-mobile.tsx           # Mobile detection
+│       └── lib/
+│           ├── queryClient.ts           # TanStack Query config & API helpers
+│           └── utils.ts                 # Utility functions
 │
-├── client/                     # Frontend assets
-│   ├── public/
-│   └── replit_integrations/
+├── server/                        # Backend
+│   ├── index.ts                   # Express app setup and server startup
+│   ├── routes.ts                  # All API endpoints
+│   ├── openai.ts                  # AI generation functions (7 tools)
+│   ├── storage.ts                 # Database CRUD operations
+│   ├── db.ts                      # PostgreSQL connection & Drizzle setup
+│   ├── seed.ts                    # Sample data seeding
+│   ├── static.ts                  # Static file serving (production)
+│   └── vite.ts                    # Vite dev server integration
 │
-├── src/                        # React application
-│   ├── components/             # UI components (ShadCN)
-│   ├── hooks/                  # Custom hooks
-│   ├── lib/                    # Utilities, query client
-│   ├── pages/                  # App pages (Home, Not Found)
-│   ├── main.tsx                # App entry point
-│   └── index.css               # Global styles
+├── shared/                        # Shared between client and server
+│   └── schema.ts                  # Drizzle ORM table definitions & Zod schemas
 │
-├── server/                     # Backend logic
-│   ├── replit_integrations/    # Replit server helpers
-│   ├── batch/                  # Batch processing utilities
-│   ├── db.ts                   # Database setup (Drizzle)
-│   ├── openai.ts               # LLM integration
-│   ├── routes.ts               # API routes
-│   └── index.ts                # Server entry point
-│
-├── shared/                     # Shared models & schemas
-│   ├── models/
-│   └── schema.ts
-│
-├── attached_assets/            # Temporary assets (ignored in prod)
-│
+├── migrations/                    # Auto-generated Drizzle migrations
 ├── package.json
 ├── tsconfig.json
+├── vite.config.ts
 ├── tailwind.config.ts
 ├── drizzle.config.ts
-├── vite.config.ts
-├── README.md
-└── .replit
+├── components.json                # ShadCN UI config
+└── README.md
 ```
 
 ---
 
-## 🔧 **How It Works**
+## How It Works
 
-1. User enters a product idea in the UI.  
-2. Frontend sends the idea to the backend via `/api/generate-prd`.  
-3. Backend injects the idea into a structured PRD prompt.  
-4. LLM generates a complete PRD.  
-5. PRD is saved to the database and displayed in the UI.  
-6. User can switch between saved PRDs in the sidebar.
+### PRD Generation
+1. User enters a product idea in the input form.
+2. Frontend sends the idea to `POST /api/prds/generate`.
+3. Backend injects the idea into a structured prompt and calls the AI model.
+4. The AI generates a complete PRD with all sections.
+5. The PRD is saved to PostgreSQL and displayed in the UI.
+6. User can edit sections inline, request AI rewrites, view version history, export, or share.
+
+### AI Tool Workflow
+1. User navigates to a tool page (e.g., User Story Generator).
+2. User provides the relevant input (feature description, problem statement, backlog, etc.).
+3. Backend processes the input through a tool-specific AI prompt.
+4. Results are saved and displayed with options to edit, version, and share.
 
 ---
 
-## 🖼️ **Screenshots**
+## API Endpoints
+
+### PRD Operations
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/prds` | List all PRDs |
+| GET | `/api/prds/:id` | Get a single PRD |
+| POST | `/api/prds/generate` | Generate a new PRD |
+| PATCH | `/api/prds/:id` | Update a PRD (creates version snapshot) |
+| DELETE | `/api/prds/:id` | Delete a PRD |
+| POST | `/api/prds/:id/share` | Generate a shareable link |
+| GET | `/api/shared/:shareId` | Get a shared PRD (read-only) |
+| GET | `/api/prds/:id/versions` | Get version history |
+| POST | `/api/prds/:id/versions/:versionId/restore` | Restore a version |
+
+### AI Tool Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/tools/user-stories/generate` | Generate user stories |
+| POST | `/api/tools/refine-problem/generate` | Refine a problem statement |
+| POST | `/api/tools/prioritize-features/generate` | Prioritize features (RICE) |
+| POST | `/api/tools/plan-sprint/generate` | Generate a sprint plan |
+| POST | `/api/tools/interview-prep/generate` | Prepare interview answers |
+| POST | `/api/tools/rewrite-section` | AI rewrite of a PRD section |
+
+### Tool Results, Templates & Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tool-results` | List all tool results |
+| PATCH | `/api/tool-results/:id` | Update a tool result |
+| DELETE | `/api/tool-results/:id` | Delete a tool result |
+| POST | `/api/tool-results/:id/share` | Share a tool result |
+| GET | `/api/templates` | List custom templates |
+| POST | `/api/templates` | Create a template |
+| DELETE | `/api/templates/:id` | Delete a template |
+| GET | `/api/analytics/summary` | Usage analytics summary |
+
+---
+
+## Screenshots
 
 ### Landing Page
 
@@ -151,26 +246,51 @@ idea-to-docs/
 
 ---
 
-## 📈 **Future Enhancements**
+## Setup & Development
 
-- Export PRD as PDF or Markdown  
-- Collaborative editing  
-- Version history  
-- Custom PRD templates  
-- Multi‑model support  
-- User accounts + cloud sync  
-- Shareable PRD links  
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- `DATABASE_URL` environment variable
+- OpenAI API credentials (configured via Replit AI services)
+
+### Development
+```bash
+npm install
+npm run db:push    # Apply database migrations
+npm run dev        # Start dev server on port 5000
+```
+
+### Production
+```bash
+npm run build      # Build client + bundle server
+npm start          # Run production server on port 5000
+```
+
+### Type Checking
+```bash
+npm run check      # Run TypeScript compiler
+```
 
 ---
 
-## 🧩 Development Approach
-This project was built using a combination of traditional development and AI‑assisted coding workflows on Replit. Leveraging Replit’s AI tools enabled rapid prototyping and allowed me to focus on product strategy, UX, and prompt engineering while still maintaining full ownership of the architecture and implementation.
+## Future Enhancements
+
+- Collaborative editing (multi-user)
+- Multi-model support (choose between different AI models)
+- User accounts with cloud sync
+- Analytics dashboard for product teams
 
 ---
 
-## 👤 **Author**
+## Development Approach
+This project was built using a combination of traditional development and AI-assisted coding workflows on Replit. Leveraging Replit's AI tools enabled rapid prototyping and allowed focus on product strategy, UX, and prompt engineering while maintaining full ownership of the architecture and implementation.
 
-Built by **Vidyullatha**, aspiring AI Product Manager.  
-This project showcases practical AI product development, prompt engineering, and full‑stack deployment.
+---
+
+## Author
+
+Built by **Vidyullatha**, aspiring AI Product Manager.
+This project showcases practical AI product development, prompt engineering, and full-stack deployment.
 
 ---
