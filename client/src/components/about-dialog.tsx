@@ -42,7 +42,7 @@ export function AboutDialog() {
             About IdeaForge
           </DialogTitle>
           <DialogDescription>
-            AI-powered PRD generation for product managers and founders
+            AI-powered PM toolkit for product managers, founders, and aspiring PMs
           </DialogDescription>
         </DialogHeader>
 
@@ -50,9 +50,9 @@ export function AboutDialog() {
           <section>
             <h4 className="font-semibold mb-2">What It Does</h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              IdeaForge transforms rough product ideas into structured Product Requirements Documents (PRDs) 
-              with comprehensive user stories and acceptance criteria. Simply describe your idea, and our AI 
-              generates a complete PRD ready for development.
+              IdeaForge is a comprehensive PM toolkit with 7 AI-powered tools: PRD Generator, User Story Generator,
+              Problem Statement Refiner, Feature Prioritizer (RICE), Sprint Planner, Interview Prep, and Compare PRDs.
+              Transform rough ideas into polished product documents in seconds.
             </p>
           </section>
 
@@ -65,21 +65,21 @@ export function AboutDialog() {
                 <Target className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-medium">Product Managers</p>
-                  <p className="text-xs text-muted-foreground">Quickly draft PRDs and user stories</p>
+                  <p className="text-xs text-muted-foreground">Generate PRDs, prioritize features, and plan sprints</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Zap className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-medium">Founders & Entrepreneurs</p>
-                  <p className="text-xs text-muted-foreground">Transform ideas into actionable specs</p>
+                  <p className="text-xs text-muted-foreground">Refine problems, write user stories, and scope MVPs</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Users className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-medium">Students & Aspiring PMs</p>
-                  <p className="text-xs text-muted-foreground">Learn PRD structure and best practices</p>
+                  <p className="text-xs text-muted-foreground">Practice interview questions and learn PM frameworks</p>
                 </div>
               </div>
             </div>
@@ -88,13 +88,16 @@ export function AboutDialog() {
           <Separator />
 
           <section>
-            <h4 className="font-semibold mb-2">How To Use</h4>
-            <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-              <li>Describe your product idea in 3-5 sentences</li>
-              <li>Click "Generate PRD" and wait for the AI</li>
-              <li>Review and edit the generated document</li>
-              <li>Copy or export to your preferred tool</li>
-            </ol>
+            <h4 className="font-semibold mb-2">Tools Available</h4>
+            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <li>PRD Generator with templates and AI rewriting</li>
+              <li>User Story Generator with acceptance criteria</li>
+              <li>Problem Statement Refiner</li>
+              <li>Feature Prioritizer (RICE framework)</li>
+              <li>Sprint Planning Helper</li>
+              <li>PM Interview Prep Coach</li>
+              <li>Compare PRDs side-by-side</li>
+            </ul>
           </section>
 
           {analytics && (

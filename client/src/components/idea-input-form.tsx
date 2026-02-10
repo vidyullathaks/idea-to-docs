@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,6 +24,7 @@ type FormData = z.infer<typeof formSchema>;
 interface IdeaInputFormProps {
   onSubmit: (idea: string) => void;
   isLoading: boolean;
+  initialIdea?: string;
 }
 
 const exampleIdeas = [
@@ -32,7 +33,7 @@ const exampleIdeas = [
   "A browser extension that summarizes long articles into key bullet points",
 ];
 
-export function IdeaInputForm({ onSubmit, isLoading }: IdeaInputFormProps) {
+export function IdeaInputForm({ onSubmit, isLoading, initialIdea }: IdeaInputFormProps) {
   const [selectedExample, setSelectedExample] = useState<string | null>(null);
   
   const form = useForm<FormData>({
@@ -41,6 +42,12 @@ export function IdeaInputForm({ onSubmit, isLoading }: IdeaInputFormProps) {
       idea: "",
     },
   });
+
+  useEffect(() => {
+    if (initialIdea) {
+      form.setValue("idea", initialIdea);
+    }
+  }, [initialIdea, form]);
 
   const handleSubmit = (data: FormData) => {
     onSubmit(data.idea);

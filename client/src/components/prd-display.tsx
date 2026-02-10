@@ -12,7 +12,9 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  AlertTriangle
+  AlertTriangle,
+  Pencil,
+  Loader2
 } from "lucide-react";
 import { SiNotion, SiJira } from "react-icons/si";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,12 +27,147 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Prd, UserStory } from "@shared/schema";
 
 interface PrdDisplayProps {
   prd: Prd;
+  onUpdate?: (updates: Partial<Prd>) => void;
+}
+
+function RewriteDialog({
+  open,
+  onOpenChange,
+  sectionName,
+  currentContent,
+  onAccept,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sectionName: string;
+  currentContent: string;
+  onAccept: (rewrittenContent: string) => void;
+}) {
+  const [instruction, setInstruction] = useState("");
+  const [rewrittenContent, setRewrittenContent] = useState<string | null>(null);
+
+  const rewriteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/tools/rewrite-section", {
+        sectionName,
+        currentContent,
+        instruction,
+      });
+      return res.json() as Promise<{ rewrittenContent: string }>;
+    },
+    onSuccess: (data) => {
+      setRewrittenContent(data.rewrittenContent);
+    },
+  });
+
+  const handleClose = (value: boolean) => {
+    if (!value) {
+      setInstruction("");
+      setRewrittenContent(null);
+      rewriteMutation.reset();
+    }
+    onOpenChange(value);
+  };
+
+  const handleAccept = () => {
+    if (rewrittenContent) {
+      onAccept(rewrittenContent);
+      handleClose(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setRewrittenContent(null);
+    rewriteMutation.reset();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-lg" data-testid="dialog-rewrite-section">
+        <DialogHeader>
+          <DialogTitle data-testid="text-rewrite-title">Rewrite: {sectionName}</DialogTitle>
+          <DialogDescription>Provide instructions for how this section should be rewritten.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium mb-1">Current Content</p>
+            <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md max-h-32 overflow-y-auto" data-testid="text-current-content">
+              {currentContent}
+            </div>
+          </div>
+
+          {rewrittenContent ? (
+            <>
+              <div>
+                <p className="text-sm font-medium mb-1">Rewritten Content</p>
+                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md max-h-32 overflow-y-auto" data-testid="text-rewritten-content">
+                  {rewrittenContent}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  data-testid="button-rewrite-cancel"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAccept}
+                  data-testid="button-rewrite-accept"
+                >
+                  Accept
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <p className="text-sm font-medium mb-1">Rewrite Instruction</p>
+                <Textarea
+                  placeholder="e.g., Make it more concise, Add more detail, Add metrics..."
+                  value={instruction}
+                  onChange={(e) => setInstruction(e.target.value)}
+                  data-testid="input-rewrite-instruction"
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => rewriteMutation.mutate()}
+                  disabled={instruction.length < 5 || rewriteMutation.isPending}
+                  data-testid="button-rewrite-submit"
+                >
+                  {rewriteMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Rewriting...
+                    </>
+                  ) : (
+                    "Rewrite"
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function PriorityBadge({ priority }: { priority: string }) {
@@ -103,18 +240,31 @@ function Section({
   icon: Icon, 
   title, 
   children,
-  className = ""
+  className = "",
+  onRewrite,
 }: { 
   icon: React.ElementType; 
   title: string; 
   children: React.ReactNode;
   className?: string;
+  onRewrite?: () => void;
 }) {
   return (
     <div className={`space-y-3 ${className}`}>
       <h3 className="font-semibold flex items-center gap-2">
         <Icon className="h-5 w-5 text-primary" />
         {title}
+        {onRewrite && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onRewrite}
+            className="h-7 w-7"
+            data-testid={`button-rewrite-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        )}
       </h3>
       {children}
     </div>
@@ -124,16 +274,18 @@ function Section({
 function ListSection({ 
   icon: Icon, 
   title, 
-  items 
+  items,
+  onRewrite,
 }: { 
   icon: React.ElementType; 
   title: string; 
   items: string[] | null | undefined;
+  onRewrite?: () => void;
 }) {
   if (!items || items.length === 0) return null;
   
   return (
-    <Section icon={Icon} title={title}>
+    <Section icon={Icon} title={title} onRewrite={onRewrite}>
       <ul className="space-y-2">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
@@ -146,8 +298,14 @@ function ListSection({
   );
 }
 
-export function PrdDisplay({ prd }: PrdDisplayProps) {
+export function PrdDisplay({ prd, onUpdate }: PrdDisplayProps) {
   const [copied, setCopied] = useState(false);
+  const [rewriteDialog, setRewriteDialog] = useState<{
+    sectionName: string;
+    currentContent: string;
+    fieldKey: keyof Prd;
+    isArray: boolean;
+  } | null>(null);
   const { toast } = useToast();
 
   const handleCopy = async () => {
@@ -156,11 +314,9 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     
-    // Log export analytics
     try {
       await apiRequest("POST", "/api/analytics/export", { prdId: prd.id, exportType: 'markdown' });
     } catch (e) {
-      // Silent fail for analytics
     }
   };
 
@@ -170,11 +326,9 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
       description: "Connect your Notion account in Settings to enable export. For now, use 'Copy' to copy the PRD as Markdown.",
     });
     
-    // Log export attempt
     try {
       await apiRequest("POST", "/api/analytics/export", { prdId: prd.id, exportType: 'notion' });
     } catch (e) {
-      // Silent fail for analytics
     }
   };
 
@@ -184,11 +338,24 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
       description: "Connect your Jira account in Settings to enable export. For now, use 'Copy' to copy the PRD as Markdown.",
     });
     
-    // Log export attempt
     try {
       await apiRequest("POST", "/api/analytics/export", { prdId: prd.id, exportType: 'jira' });
     } catch (e) {
-      // Silent fail for analytics
+    }
+  };
+
+  const openRewrite = (sectionName: string, currentContent: string, fieldKey: keyof Prd, isArray: boolean) => {
+    setRewriteDialog({ sectionName, currentContent, fieldKey, isArray });
+  };
+
+  const handleRewriteAccept = (rewrittenContent: string) => {
+    if (!rewriteDialog || !onUpdate) return;
+    
+    if (rewriteDialog.isArray) {
+      const items = rewrittenContent.split('\n').map(s => s.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+      onUpdate({ [rewriteDialog.fieldKey]: items } as Partial<Prd>);
+    } else {
+      onUpdate({ [rewriteDialog.fieldKey]: rewrittenContent } as Partial<Prd>);
     }
   };
 
@@ -196,6 +363,16 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
 
   return (
     <div className="space-y-6">
+      {rewriteDialog && (
+        <RewriteDialog
+          open={!!rewriteDialog}
+          onOpenChange={(open) => { if (!open) setRewriteDialog(null); }}
+          sectionName={rewriteDialog.sectionName}
+          currentContent={rewriteDialog.currentContent}
+          onAccept={handleRewriteAccept}
+        />
+      )}
+
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
           <div className="space-y-1">
@@ -247,7 +424,11 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
         </CardHeader>
         <CardContent className="space-y-8">
           {prd.problemStatement && (
-            <Section icon={Target} title="Problem Statement">
+            <Section
+              icon={Target}
+              title="Problem Statement"
+              onRewrite={onUpdate ? () => openRewrite("Problem Statement", prd.problemStatement!, "problemStatement", false) : undefined}
+            >
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {prd.problemStatement}
               </p>
@@ -255,18 +436,47 @@ export function PrdDisplay({ prd }: PrdDisplayProps) {
           )}
 
           {prd.targetAudience && (
-            <Section icon={Users} title="Target Audience">
+            <Section
+              icon={Users}
+              title="Target Audience"
+              onRewrite={onUpdate ? () => openRewrite("Target Audience", prd.targetAudience!, "targetAudience", false) : undefined}
+            >
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {prd.targetAudience}
               </p>
             </Section>
           )}
 
-          <ListSection icon={Target} title="Goals & Objectives" items={prd.goals} />
-          <ListSection icon={ListChecks} title="Key Features" items={prd.features} />
-          <ListSection icon={BarChart3} title="Success Metrics" items={prd.successMetrics} />
-          <ListSection icon={XCircle} title="Out of Scope" items={prd.outOfScope} />
-          <ListSection icon={AlertCircle} title="Assumptions" items={prd.assumptions} />
+          <ListSection
+            icon={Target}
+            title="Goals & Objectives"
+            items={prd.goals}
+            onRewrite={onUpdate && prd.goals?.length ? () => openRewrite("Goals & Objectives", prd.goals!.join('\n'), "goals", true) : undefined}
+          />
+          <ListSection
+            icon={ListChecks}
+            title="Key Features"
+            items={prd.features}
+            onRewrite={onUpdate && prd.features?.length ? () => openRewrite("Key Features", prd.features!.join('\n'), "features", true) : undefined}
+          />
+          <ListSection
+            icon={BarChart3}
+            title="Success Metrics"
+            items={prd.successMetrics}
+            onRewrite={onUpdate && prd.successMetrics?.length ? () => openRewrite("Success Metrics", prd.successMetrics!.join('\n'), "successMetrics", true) : undefined}
+          />
+          <ListSection
+            icon={XCircle}
+            title="Out of Scope"
+            items={prd.outOfScope}
+            onRewrite={onUpdate && prd.outOfScope?.length ? () => openRewrite("Out of Scope", prd.outOfScope!.join('\n'), "outOfScope", true) : undefined}
+          />
+          <ListSection
+            icon={AlertCircle}
+            title="Assumptions"
+            items={prd.assumptions}
+            onRewrite={onUpdate && prd.assumptions?.length ? () => openRewrite("Assumptions", prd.assumptions!.join('\n'), "assumptions", true) : undefined}
+          />
         </CardContent>
       </Card>
 

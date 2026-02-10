@@ -1,7 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generatePrd } from "./openai";
+import {
+  generatePrd,
+  generateUserStories,
+  refineProblemStatement,
+  prioritizeFeatures,
+  planSprint,
+  prepareInterviewAnswer,
+  rewritePrdSection,
+} from "./openai";
 import { z } from "zod";
 
 const generateSchema = z.object({
@@ -154,6 +162,117 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ message: "Failed to fetch analytics" });
+    }
+  });
+
+  const userStorySchema = z.object({
+    featureIdea: z.string().min(10, "Feature idea must be at least 10 characters"),
+  });
+
+  app.post("/api/tools/user-stories", async (req, res) => {
+    try {
+      const validation = userStorySchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await generateUserStories(validation.data.featureIdea);
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating user stories:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to generate user stories" });
+    }
+  });
+
+  const problemSchema = z.object({
+    problem: z.string().min(10, "Problem description must be at least 10 characters"),
+  });
+
+  app.post("/api/tools/refine-problem", async (req, res) => {
+    try {
+      const validation = problemSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await refineProblemStatement(validation.data.problem);
+      res.json(result);
+    } catch (error) {
+      console.error("Error refining problem:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to refine problem statement" });
+    }
+  });
+
+  const featuresSchema = z.object({
+    features: z.array(z.string().min(1)).min(2, "Provide at least 2 features to prioritize"),
+  });
+
+  app.post("/api/tools/prioritize-features", async (req, res) => {
+    try {
+      const validation = featuresSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await prioritizeFeatures(validation.data.features);
+      res.json(result);
+    } catch (error) {
+      console.error("Error prioritizing features:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to prioritize features" });
+    }
+  });
+
+  const sprintSchema = z.object({
+    backlog: z.string().min(20, "Backlog must be at least 20 characters"),
+  });
+
+  app.post("/api/tools/plan-sprint", async (req, res) => {
+    try {
+      const validation = sprintSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await planSprint(validation.data.backlog);
+      res.json(result);
+    } catch (error) {
+      console.error("Error planning sprint:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to plan sprint" });
+    }
+  });
+
+  const interviewSchema = z.object({
+    question: z.string().min(10, "Question must be at least 10 characters"),
+  });
+
+  app.post("/api/tools/interview-prep", async (req, res) => {
+    try {
+      const validation = interviewSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const result = await prepareInterviewAnswer(validation.data.question);
+      res.json(result);
+    } catch (error) {
+      console.error("Error preparing interview answer:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to prepare interview answer" });
+    }
+  });
+
+  const rewriteSchema = z.object({
+    sectionName: z.string().min(1),
+    currentContent: z.string().min(1),
+    instruction: z.string().min(5, "Rewrite instruction must be at least 5 characters"),
+  });
+
+  app.post("/api/tools/rewrite-section", async (req, res) => {
+    try {
+      const validation = rewriteSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      }
+      const { sectionName, currentContent, instruction } = validation.data;
+      const result = await rewritePrdSection(sectionName, currentContent, instruction);
+      res.json(result);
+    } catch (error) {
+      console.error("Error rewriting section:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to rewrite section" });
     }
   });
 
