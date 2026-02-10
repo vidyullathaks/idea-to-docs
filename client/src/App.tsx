@@ -10,6 +10,7 @@ import { AboutDialog } from "@/components/about-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import PrdsPage from "@/pages/prds";
 import {
   UserStoryGenerator,
   ProblemRefiner,
@@ -23,6 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/prds" component={PrdsPage} />
       <Route path="/user-stories" component={UserStoryGenerator} />
       <Route path="/problem-refiner" component={ProblemRefiner} />
       <Route path="/prioritization" component={FeaturePrioritizer} />

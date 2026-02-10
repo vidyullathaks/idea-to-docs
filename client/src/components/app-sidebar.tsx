@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Sparkles,
   ArrowLeftRight,
+  FolderOpen,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,6 +24,7 @@ import {
 
 const tools = [
   { title: "PRD Generator", url: "/", icon: FileText },
+  { title: "Your PRDs", url: "/prds", icon: FolderOpen },
   { title: "Compare PRDs", url: "/compare", icon: ArrowLeftRight },
   { title: "User Story Generator", url: "/user-stories", icon: BookOpen },
   { title: "Problem Refiner", url: "/problem-refiner", icon: Target },

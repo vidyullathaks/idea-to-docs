@@ -4,6 +4,12 @@
 IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
 
 ## Recent Changes
+- **2026-02-10**: Landing page restructure and roadmap
+  - Reduced templates to 2 on home page (SaaS, Mobile)
+  - Moved PRD history to dedicated /prds page with "View Your PRDs" button
+  - Added "Coming Soon" roadmap section with 9 planned features
+  - Added "Your PRDs" link in sidebar navigation
+  - Home page now focuses on the input form with less scrolling
 - **2026-02-10**: Major expansion from PRD Generator to full PM Toolkit
   - Added 5 new AI-powered tools: User Story Generator, Problem Refiner, Feature Prioritizer (RICE), Sprint Planner, Interview Prep
   - Added sidebar navigation using Shadcn sidebar primitives + wouter routing
@@ -30,12 +36,13 @@ IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help produc
 │   │   ├── app-sidebar.tsx        # Sidebar navigation with 7 tools
 │   │   ├── idea-input-form.tsx    # PRD idea input with template support
 │   │   ├── prd-display.tsx        # PRD viewer with rewrite dialog
-│   │   ├── prd-list.tsx           # PRD history sidebar
+│   │   ├── prd-list.tsx           # PRD list component (used on /prds page)
 │   │   ├── loading-prd.tsx        # Generation loading state
 │   │   ├── about-dialog.tsx       # About dialog with toolkit info
 │   │   └── theme-*.tsx            # Theme provider and toggle
 │   ├── pages/
-│   │   ├── home.tsx               # PRD Generator (main page)
+│   │   ├── home.tsx               # Landing page with input, 2 templates, roadmap
+│   │   ├── prds.tsx               # PRD history page (view/delete PRDs)
 │   │   ├── tool-pages.tsx         # 5 AI tools (User Stories, Problem Refiner, etc.)
 │   │   └── compare-prds.tsx       # Compare PRDs side-by-side
 │   └── lib/

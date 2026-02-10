@@ -3,11 +3,35 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { IdeaInputForm } from "@/components/idea-input-form";
 import { PrdDisplay } from "@/components/prd-display";
-import { PrdList } from "@/components/prd-list";
 import { LoadingPrd } from "@/components/loading-prd";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, FileText, CheckCircle2, Cloud, Smartphone, ShoppingCart, Code, Newspaper, BookOpen, Target, BarChart3, Calendar, GraduationCap, ArrowLeftRight, Wand2 } from "lucide-react";
+import { useLocation } from "wouter";
+import {
+  Sparkles,
+  FileText,
+  Cloud,
+  Smartphone,
+  BookOpen,
+  Target,
+  BarChart3,
+  Calendar,
+  GraduationCap,
+  ArrowLeftRight,
+  ArrowRight,
+  Download,
+  Users,
+  History,
+  Palette,
+  Cpu,
+  UserCircle,
+  Link2,
+  Lock,
+  ExternalLink,
+  Globe,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import type { Prd } from "@shared/schema";
 
 const templates = [
@@ -21,21 +45,18 @@ const templates = [
     icon: Smartphone,
     idea: "A mobile fitness app that creates personalized workout plans based on users' fitness goals, available equipment, and schedule. It should track progress with visual charts, offer video demonstrations for exercises, and include a social feature where users can challenge friends.",
   },
-  {
-    title: "E-commerce Platform",
-    icon: ShoppingCart,
-    idea: "An online marketplace for handmade and artisanal food products that connects local food artisans with health-conscious consumers. The platform should support subscription boxes, provide detailed sourcing information, and handle cold-chain shipping logistics.",
-  },
-  {
-    title: "Developer Tool",
-    icon: Code,
-    idea: "A CLI tool and VS Code extension that automatically generates API documentation from code comments and type definitions. It should support TypeScript, Python, and Go, output OpenAPI specs, and include a hosted documentation site with search and versioning.",
-  },
-  {
-    title: "Content Platform",
-    icon: Newspaper,
-    idea: "A community-driven learning platform where industry professionals can create and sell micro-courses (under 2 hours). It should include interactive quizzes, completion certificates, a review system, and revenue sharing for course creators.",
-  },
+];
+
+const roadmapItems = [
+  { icon: Download, label: "Export as PDF or Markdown", status: "coming-soon" as const },
+  { icon: Users, label: "Collaborative editing", status: "planned" as const },
+  { icon: History, label: "Version history", status: "planned" as const },
+  { icon: Palette, label: "Custom templates", status: "planned" as const },
+  { icon: Cpu, label: "Multi-model support", status: "planned" as const },
+  { icon: UserCircle, label: "User accounts + cloud sync", status: "planned" as const },
+  { icon: Link2, label: "Shareable links", status: "planned" as const },
+  { icon: ExternalLink, label: "Export to Notion / Jira", status: "planned" as const },
+  { icon: Globe, label: "Multi-language support", status: "planned" as const },
 ];
 
 type ViewState = "input" | "loading" | "display";
@@ -45,8 +66,9 @@ export default function Home() {
   const [selectedPrd, setSelectedPrd] = useState<Prd | null>(null);
   const [templateIdea, setTemplateIdea] = useState("");
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
-  const { data: prds = [], isLoading: prdsLoading } = useQuery<Prd[]>({
+  const { data: prds = [] } = useQuery<Prd[]>({
     queryKey: ["/api/prds"],
   });
 
@@ -82,11 +104,6 @@ export default function Home() {
     generateMutation.mutate(idea);
   }, [generateMutation]);
 
-  const handleSelectPrd = useCallback((prd: Prd) => {
-    setSelectedPrd(prd);
-    setViewState("display");
-  }, []);
-
   const handleNewPrd = useCallback(() => {
     setSelectedPrd(null);
     setViewState("input");
@@ -102,17 +119,17 @@ export default function Home() {
   return (
     <div className="bg-background">
       {viewState === "input" && !selectedPrd && (
-        <section className="bg-gradient-to-b from-primary/5 to-background py-12 border-b border-border/50">
+        <section className="bg-gradient-to-b from-primary/5 to-background py-10 border-b border-border/50">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" data-testid="text-hero-title">
               Your AI-Powered
               <span className="text-primary"> PM Toolkit</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8" data-testid="text-hero-subtitle">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-hero-subtitle">
               7 tools to help you write PRDs, prioritize features, plan sprints, and more — all powered by AI.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 max-w-4xl mx-auto mt-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 max-w-4xl mx-auto mt-6">
               {[
                 { icon: FileText, label: "PRDs" },
                 { icon: BookOpen, label: "User Stories" },
@@ -134,62 +151,111 @@ export default function Home() {
         </section>
       )}
 
-      {viewState === "input" && !selectedPrd && (
-        <section className="container mx-auto px-4 py-8" data-testid="section-templates">
-          <h2 className="text-xl font-semibold mb-4" data-testid="text-templates-header">Start with a Template</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templates.map((template, index) => (
-              <Card
-                key={template.title}
-                className="hover-elevate cursor-pointer"
-                onClick={() => setTemplateIdea(template.idea)}
-                data-testid={`card-template-${index}`}
-              >
-                <CardContent className="flex items-start gap-3 p-4">
-                  <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                    <template.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-medium mb-1" data-testid={`text-template-title-${index}`}>{template.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-template-preview-${index}`}>{template.idea}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="container mx-auto px-4 py-8 max-w-3xl">
+        {viewState === "input" && !selectedPrd && (
+          <div className="space-y-8">
+            <section data-testid="section-templates">
+              <h2 className="text-lg font-semibold mb-3" data-testid="text-templates-header">Start with a Template</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {templates.map((template, index) => (
+                  <Card
+                    key={template.title}
+                    className="hover-elevate cursor-pointer"
+                    onClick={() => setTemplateIdea(template.idea)}
+                    data-testid={`card-template-${index}`}
+                  >
+                    <CardContent className="flex items-start gap-3 p-4">
+                      <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                        <template.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-medium mb-1" data-testid={`text-template-title-${index}`}>{template.title}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-template-preview-${index}`}>{template.idea}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-[320px_1fr] gap-8">
-          <aside className="order-2 lg:order-1">
-            <div className="sticky top-24">
-              <PrdList
-                prds={prds}
-                onSelect={handleSelectPrd}
-                onNew={handleNewPrd}
-                isLoading={prdsLoading}
-                selectedId={selectedPrd?.id}
-              />
+            <IdeaInputForm
+              onSubmit={handleSubmit}
+              isLoading={generateMutation.isPending}
+              initialIdea={templateIdea}
+            />
+
+            {prds.length > 0 && (
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/prds")}
+                  data-testid="button-view-prds"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  View Your PRDs ({prds.length})
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            <section className="border-t border-border/50 pt-8" data-testid="section-roadmap">
+              <div className="text-center mb-6">
+                <h2 className="text-lg font-semibold" data-testid="text-roadmap-header">Coming Soon</h2>
+                <p className="text-sm text-muted-foreground mt-1">Features we're working on next</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {roadmapItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-3 p-3 rounded-md border border-border/50 bg-card/50"
+                    data-testid={`roadmap-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0">
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <span className="text-sm font-medium flex-1">{item.label}</span>
+                    <Badge variant="secondary" className="text-xs shrink-0">
+                      {item.status === "coming-soon" ? "Coming Soon" : "Planned"}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-muted-foreground text-center mt-4 space-y-1">
+                <p>
+                  <Lock className="inline h-3 w-3 mr-1" />
+                  Current limitations: No collaboration yet, no editing inside the tool.
+                </p>
+                <p>PRDs are saved to your session. Cloud sync, Notion/Jira export, and multi-language support are coming.</p>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {viewState === "input" && selectedPrd && (
+          <IdeaInputForm
+            onSubmit={handleSubmit}
+            isLoading={generateMutation.isPending}
+            initialIdea={templateIdea}
+          />
+        )}
+
+        {viewState === "loading" && <LoadingPrd />}
+
+        {viewState === "display" && selectedPrd && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={handleNewPrd} data-testid="button-back-to-input">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate Another
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/prds")} data-testid="button-view-all-prds">
+                <FileText className="mr-2 h-4 w-4" />
+                View All PRDs
+              </Button>
             </div>
-          </aside>
-
-          <div className="order-1 lg:order-2">
-            {viewState === "input" && (
-              <IdeaInputForm
-                onSubmit={handleSubmit}
-                isLoading={generateMutation.isPending}
-                initialIdea={templateIdea}
-              />
-            )}
-
-            {viewState === "loading" && <LoadingPrd />}
-
-            {viewState === "display" && selectedPrd && (
-              <PrdDisplay prd={selectedPrd} onUpdate={handleUpdatePrd} />
-            )}
+            <PrdDisplay prd={selectedPrd} onUpdate={handleUpdatePrd} />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
