@@ -232,17 +232,13 @@ idea-to-docs/
 
 ## Screenshots
 
-### Landing Page
+<img width="1792" height="1004" alt="Screenshot 2026-02-10 at 1 32 45 PM" src="https://github.com/user-attachments/assets/514f6f36-aa5a-443f-b1f4-385e7552e30d" />
 
-<img width="3588" height="2066" alt="image" src="https://github.com/user-attachments/assets/9d154743-e5ab-4458-965d-e824f70e090c" />
+<img width="1797" height="1036" alt="Screenshot 2026-02-10 at 1 33 12 PM" src="https://github.com/user-attachments/assets/55baa881-6ab9-4eff-afdb-3e921d6ee25a" />
 
-### Example: Generated PRD for "Designed and shipped an AI-powered habit coaching system with automated check-ins and personalized feedback"
+<img width="1794" height="1035" alt="Screenshot 2026-02-10 at 1 58 39 PM" src="https://github.com/user-attachments/assets/d3ccefc1-9050-4396-b3db-8dd622741826" />
 
-<img width="3594" height="2070" alt="image" src="https://github.com/user-attachments/assets/f390edac-6c76-4e80-b9fd-47e9ab352bcf" />
-
-<img width="3594" height="2072" alt="image" src="https://github.com/user-attachments/assets/864dbce7-51db-4277-87b7-0b258b37dd66" />
-
-<img width="3574" height="2062" alt="image" src="https://github.com/user-attachments/assets/f2075c1a-435a-4321-8c23-2f6db6a0139b" />
+<img width="1796" height="1039" alt="Screenshot 2026-02-10 at 1 59 31 PM" src="https://github.com/user-attachments/assets/547eb970-b036-4d6e-ac74-cdb88bf69e0c" />
 
 ---
 
