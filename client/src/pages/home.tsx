@@ -6,7 +6,7 @@ import { PrdDisplay } from "@/components/prd-display";
 import { PrdList } from "@/components/prd-list";
 import { LoadingPrd } from "@/components/loading-prd";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, FileText, CheckCircle2, Cloud, Smartphone, ShoppingCart, Code, Newspaper } from "lucide-react";
+import { Sparkles, FileText, CheckCircle2, Cloud, Smartphone, ShoppingCart, Code, Newspaper, BookOpen, Target, BarChart3, Calendar, GraduationCap, ArrowLeftRight, Wand2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Prd } from "@shared/schema";
 
@@ -105,35 +105,30 @@ export default function Home() {
         <section className="bg-gradient-to-b from-primary/5 to-background py-12 border-b border-border/50">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" data-testid="text-hero-title">
-              Turn Any Idea Into a
-              <span className="text-primary"> Complete PRD</span>
+              Your AI-Powered
+              <span className="text-primary"> PM Toolkit</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8" data-testid="text-hero-subtitle">
-              Structured requirements, user stories, and acceptance criteria — generated instantly by AI.
+              7 tools to help you write PRDs, prioritize features, plan sprints, and more — all powered by AI.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mt-8">
-              <div className="flex flex-col items-center gap-2 p-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-primary" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 max-w-4xl mx-auto mt-8">
+              {[
+                { icon: FileText, label: "PRDs" },
+                { icon: BookOpen, label: "User Stories" },
+                { icon: Target, label: "Problem Refiner" },
+                { icon: BarChart3, label: "Prioritization" },
+                { icon: Calendar, label: "Sprint Planning" },
+                { icon: GraduationCap, label: "Interview Prep" },
+                { icon: ArrowLeftRight, label: "Compare" },
+              ].map((tool) => (
+                <div key={tool.label} className="flex flex-col items-center gap-2 p-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <tool.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">{tool.label}</span>
                 </div>
-                <h3 className="font-semibold">1. Describe Your Idea</h3>
-                <p className="text-sm text-muted-foreground">Write a few sentences about your product concept</p>
-              </div>
-              <div className="flex flex-col items-center gap-2 p-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold">2. AI Generates PRD</h3>
-                <p className="text-sm text-muted-foreground">Get a complete PRD with user stories in seconds</p>
-              </div>
-              <div className="flex flex-col items-center gap-2 p-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold">3. Export & Share</h3>
-                <p className="text-sm text-muted-foreground">Copy as Markdown or export to Notion/Jira</p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
