@@ -54,7 +54,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {tools.map((tool) => (
                 <SidebarMenuItem key={tool.title}>
-                  <SidebarMenuButton asChild isActive={location === tool.url} data-testid={`sidebar-link-${tool.url}`}>
+                  <SidebarMenuButton asChild isActive={location === tool.url} data-testid={`sidebar-link-${tool.title.toLowerCase().replace(/\s+/g, "-")}`}>
                     <Link href={tool.url}>
                       <tool.icon />
                       <span>{tool.title}</span>

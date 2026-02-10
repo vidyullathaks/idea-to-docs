@@ -45,7 +45,7 @@ export function IdeaInputForm({ onSubmit, isLoading, initialIdea }: IdeaInputFor
 
   useEffect(() => {
     if (initialIdea) {
-      form.setValue("idea", initialIdea);
+      form.setValue("idea", initialIdea, { shouldDirty: true, shouldValidate: true });
     }
   }, [initialIdea, form]);
 

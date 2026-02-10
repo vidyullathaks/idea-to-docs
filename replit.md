@@ -69,12 +69,12 @@ IdeaForge is a comprehensive AI-powered PM toolkit with 7 tools that help produc
 - `GET /api/prds/:id` — Get single PRD
 - `POST /api/prds/generate` — Generate new PRD from idea
 - `DELETE /api/prds/:id` — Delete PRD
-- `POST /api/ai/user-stories` — Generate user stories
-- `POST /api/ai/refine-problem` — Refine problem statement
-- `POST /api/ai/prioritize-features` — RICE feature prioritization
-- `POST /api/ai/sprint-plan` — Generate sprint plan
-- `POST /api/ai/interview-prep` — PM interview prep
-- `POST /api/ai/rewrite-section` — Rewrite PRD section
+- `POST /api/tools/user-stories` — Generate user stories
+- `POST /api/tools/refine-problem` — Refine problem statement
+- `POST /api/tools/prioritize-features` — RICE feature prioritization
+- `POST /api/tools/plan-sprint` — Generate sprint plan
+- `POST /api/tools/interview-prep` — PM interview prep
+- `POST /api/tools/rewrite-section` — Rewrite PRD section
 
 ### Database Schema
 ```typescript
