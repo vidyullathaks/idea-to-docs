@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { IdeaInputForm } from "@/components/idea-input-form";
 import { PrdDisplay } from "@/components/prd-display";
@@ -17,7 +17,6 @@ import {
   Calendar,
   GraduationCap,
   ArrowLeftRight,
-  ArrowRight,
   Download,
   Users,
   History,
@@ -73,10 +72,6 @@ export default function Home() {
   const [model, setModel] = useState("gpt-5.2");
   const { toast } = useToast();
   const [, navigate] = useLocation();
-
-  const { data: prds = [] } = useQuery<Prd[]>({
-    queryKey: ["/api/prds"],
-  });
 
   const generateMutation = useMutation({
     mutationFn: async (idea: string) => {
@@ -167,20 +162,6 @@ export default function Home() {
               model={model}
               onModelChange={setModel}
             />
-
-            {prds.length > 0 && (
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/prds")}
-                  data-testid="button-view-prds"
-                >
-                  <FileText className="mr-2 h-4 w-4" />
-                  View Your PRDs ({prds.length})
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            )}
 
             <section data-testid="section-templates">
               <h2 className="text-lg font-semibold mb-3" data-testid="text-templates-header">Start with a Template</h2>
