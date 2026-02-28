@@ -54,12 +54,12 @@ const liveFeatures = [
   { icon: Pencil, label: "Inline editing with version history" },
   { icon: Link2, label: "Shareable links" },
   { icon: Palette, label: "Custom templates" },
+  { icon: ExternalLink, label: "Export to Notion" },
 ];
 
 const roadmapItems = [
   { icon: Users, label: "Collaborative editing", status: "planned" as const },
   { icon: UserCircle, label: "User accounts + cloud sync", status: "planned" as const },
-  { icon: ExternalLink, label: "Export to Notion / Jira", status: "planned" as const },
   { icon: Globe, label: "Multi-language support", status: "planned" as const },
 ];
 

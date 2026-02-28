@@ -10,6 +10,7 @@ import {
   prepareInterviewAnswer,
   rewritePrdSection,
 } from "./openai";
+import { searchNotionPages, exportPrdToNotion, exportToolResultToNotion } from "./notion";
 import { z } from "zod";
 
 const generateSchema = z.object({
@@ -677,6 +678,52 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error rewriting section:", error);
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to rewrite section" });
+    }
+  });
+
+  app.get("/api/notion/pages", async (req, res) => {
+    try {
+      const query = req.query.q as string | undefined;
+      const pages = await searchNotionPages(query);
+      res.json(pages);
+    } catch (error) {
+      console.error("Error searching Notion pages:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to search Notion" });
+    }
+  });
+
+  const notionExportSchema = z.object({
+    parentPageId: z.string().min(1, "parentPageId is required"),
+  });
+
+  app.post("/api/export/notion/prd/:id", async (req, res) => {
+    try {
+      const prd = await storage.getPrd(parseInt(req.params.id));
+      if (!prd) return res.status(404).json({ message: "PRD not found" });
+      const validation = notionExportSchema.safeParse(req.body);
+      if (!validation.success) return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      const { parentPageId } = validation.data;
+      const url = await exportPrdToNotion(prd, parentPageId);
+      res.json({ url });
+    } catch (error) {
+      console.error("Error exporting PRD to Notion:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to export to Notion" });
+    }
+  });
+
+  app.post("/api/export/notion/tool-result/:id", async (req, res) => {
+    try {
+      const toolResult = await storage.getToolResult(parseInt(req.params.id));
+      if (!toolResult) return res.status(404).json({ message: "Tool result not found" });
+      const validation = notionExportSchema.safeParse(req.body);
+      if (!validation.success) return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
+      const { parentPageId } = validation.data;
+      const result = toolResult.result as Record<string, unknown>;
+      const url = await exportToolResultToNotion(toolResult.title, toolResult.toolType, toolResult.rawInput, result, parentPageId);
+      res.json({ url });
+    } catch (error) {
+      console.error("Error exporting tool result to Notion:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to export to Notion" });
     }
   });
 

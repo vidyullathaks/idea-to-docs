@@ -46,10 +46,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
+import { NotionExportDialog } from "@/components/notion-export-dialog";
 import type { ToolResult, ToolResultVersion } from "@shared/schema";
 
 interface ToolResultDisplayProps {
@@ -728,6 +730,7 @@ export function ToolResultDisplay({ toolResult, onUpdate, readOnly = false }: To
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showNotionExport, setShowNotionExport] = useState(false);
   const { toast } = useToast();
   const meta = TOOL_META[toolResult.toolType] || { icon: BookOpen, label: toolResult.toolType };
   const Icon = meta.icon;
@@ -814,6 +817,12 @@ export function ToolResultDisplay({ toolResult, onUpdate, readOnly = false }: To
         onRestore={handleVersionRestore}
       />
 
+      <NotionExportDialog
+        open={showNotionExport}
+        onOpenChange={setShowNotionExport}
+        exportEndpoint={`/api/export/notion/tool-result/${toolResult.id}`}
+      />
+
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-tool-result-title">
@@ -841,6 +850,9 @@ export function ToolResultDisplay({ toolResult, onUpdate, readOnly = false }: To
         </Button>
         <Button variant="outline" size="sm" onClick={handleDownloadPdf} data-testid="button-download-pdf">
           <FileDown className="mr-2 h-4 w-4" />PDF
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setShowNotionExport(true)} data-testid="button-export-notion">
+          <ExternalLink className="mr-2 h-4 w-4" />Notion
         </Button>
         {!readOnly && (
           <>

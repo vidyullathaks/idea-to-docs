@@ -22,6 +22,7 @@ import {
   Save,
   X,
   RotateCcw,
+  ExternalLink,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
+import { NotionExportDialog } from "@/components/notion-export-dialog";
 import type { Prd, UserStory, PrdVersion } from "@shared/schema";
 
 interface PrdDisplayProps {
@@ -473,6 +475,7 @@ export function PrdDisplay({ prd, onUpdate, readOnly = false }: PrdDisplayProps)
     isArray: boolean;
   } | null>(null);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showNotionExport, setShowNotionExport] = useState(false);
   const { toast } = useToast();
 
   const saveMutation = useMutation({
@@ -585,6 +588,12 @@ export function PrdDisplay({ prd, onUpdate, readOnly = false }: PrdDisplayProps)
         onRestore={handleVersionRestore}
       />
 
+      <NotionExportDialog
+        open={showNotionExport}
+        onOpenChange={setShowNotionExport}
+        exportEndpoint={`/api/export/notion/prd/${prd.id}`}
+      />
+
       <Card>
         <CardHeader className="space-y-3">
           <div className="flex flex-row items-start justify-between gap-4">
@@ -612,6 +621,9 @@ export function PrdDisplay({ prd, onUpdate, readOnly = false }: PrdDisplayProps)
             </Button>
             <Button variant="outline" size="sm" onClick={handleDownloadPdf} data-testid="button-download-pdf">
               <FileDown className="mr-2 h-4 w-4" />PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowNotionExport(true)} data-testid="button-export-notion">
+              <ExternalLink className="mr-2 h-4 w-4" />Notion
             </Button>
             {!readOnly && (
               <>

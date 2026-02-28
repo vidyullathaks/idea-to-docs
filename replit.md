@@ -4,6 +4,14 @@
 IdeaForge is a comprehensive AI-powered PM toolkit with 7+ tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
 
 ## Recent Changes
+- **2026-02-28**: Export to Notion integration
+  - Connected Notion via Replit integration (OAuth, no API key needed)
+  - Created server/notion.ts with Notion client, page search, and export functions for PRDs and tool results
+  - Created reusable NotionExportDialog component (client/src/components/notion-export-dialog.tsx)
+  - Added "Notion" export button to both PrdDisplay and ToolResultDisplay alongside existing Copy/Markdown/PDF buttons
+  - Dialog lets users search and select a Notion page, then creates a formatted child page with full content
+  - API routes: GET /api/notion/pages, POST /api/export/notion/prd/:id, POST /api/export/notion/tool-result/:id
+  - Moved "Export to Notion" from roadmap to shipped features on home page
 - **2026-02-28**: Multi-model support with Claude integration
   - Added model selector with 7 models across 2 providers to all tool pages and PRD Generator
   - OpenAI models: GPT-5.2 (default), GPT-4.1, GPT-4o, o3 Mini
