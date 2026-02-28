@@ -44,7 +44,7 @@ export default function SharedToolResult() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <ToolResultDisplay toolResult={toolResult} readOnly />
     </div>
   );

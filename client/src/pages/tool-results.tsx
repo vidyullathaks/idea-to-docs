@@ -56,7 +56,7 @@ export default function ToolResultsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Tool Results History</h1>
         <p className="text-sm text-muted-foreground mt-1">View and manage your past AI tool outputs.</p>

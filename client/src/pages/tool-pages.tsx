@@ -74,7 +74,7 @@ export function UserStoryGenerator() {
 
   if (savedResult) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-4">
           <Button variant="outline" onClick={handleReset} data-testid="button-start-over">
             <Sparkles className="h-4 w-4" />
@@ -90,7 +90,7 @@ export function UserStoryGenerator() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-tool-title">
@@ -177,7 +177,7 @@ export function ProblemRefiner() {
 
   if (savedResult) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-4">
           <Button variant="outline" onClick={handleReset} data-testid="button-start-over">
             <Sparkles className="h-4 w-4" />
@@ -193,7 +193,7 @@ export function ProblemRefiner() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-tool-title">
@@ -292,7 +292,7 @@ export function FeaturePrioritizer() {
 
   if (savedResult) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-4">
           <Button variant="outline" onClick={handleReset} data-testid="button-start-over">
             <Sparkles className="h-4 w-4" />
@@ -308,7 +308,7 @@ export function FeaturePrioritizer() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-tool-title">
@@ -408,7 +408,7 @@ export function SprintPlanner() {
 
   if (savedResult) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-4">
           <Button variant="outline" onClick={handleReset} data-testid="button-start-over">
             <Sparkles className="h-4 w-4" />
@@ -424,7 +424,7 @@ export function SprintPlanner() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-tool-title">
@@ -507,7 +507,7 @@ export function InterviewPrep() {
 
   if (savedResult) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-4">
           <Button variant="outline" onClick={handleReset} data-testid="button-start-over">
             <Sparkles className="h-4 w-4" />
@@ -523,7 +523,7 @@ export function InterviewPrep() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-tool-title">

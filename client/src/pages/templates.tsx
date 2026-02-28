@@ -75,7 +75,7 @@ export default function TemplatesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-templates-title">

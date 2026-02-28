@@ -73,7 +73,7 @@ export default function PrdsPage() {
 
   if (selectedPrd) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="flex items-center gap-3 mb-6">
           <Button variant="outline" size="sm" onClick={() => setSelectedPrd(null)} data-testid="button-back-to-list">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -86,7 +86,7 @@ export default function PrdsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-prds-title">
