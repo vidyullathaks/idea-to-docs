@@ -132,15 +132,20 @@ export default function Home() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 max-w-4xl mx-auto mt-6">
               {[
-                { icon: FileText, label: "PRDs" },
-                { icon: BookOpen, label: "User Stories" },
-                { icon: Target, label: "Problem Refiner" },
-                { icon: BarChart3, label: "Prioritization" },
-                { icon: Calendar, label: "Sprint Planning" },
-                { icon: GraduationCap, label: "Interview Prep" },
-                { icon: ArrowLeftRight, label: "Compare" },
+                { icon: FileText, label: "PRDs", path: "/prds" },
+                { icon: BookOpen, label: "User Stories", path: "/user-stories" },
+                { icon: Target, label: "Problem Refiner", path: "/problem-refiner" },
+                { icon: BarChart3, label: "Prioritization", path: "/prioritization" },
+                { icon: Calendar, label: "Sprint Planning", path: "/sprint-planning" },
+                { icon: GraduationCap, label: "Interview Prep", path: "/interview-prep" },
+                { icon: ArrowLeftRight, label: "Compare", path: "/compare" },
               ].map((tool) => (
-                <div key={tool.label} className="flex flex-col items-center gap-2 p-3">
+                <div
+                  key={tool.label}
+                  className="flex flex-col items-center gap-2 p-3 cursor-pointer rounded-lg hover:bg-primary/10 transition-colors"
+                  onClick={() => navigate(tool.path)}
+                  data-testid={`link-tool-${tool.label.toLowerCase().replace(/\s+/g, "-")}`}
+                >
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <tool.icon className="h-5 w-5 text-primary" />
                   </div>
