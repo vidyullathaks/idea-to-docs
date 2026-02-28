@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { userStorySchema, type UserStory } from "@shared/schema";
 import { z } from "zod";
 
@@ -10,6 +11,49 @@ const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "",
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
+
+const anthropic = new Anthropic({
+  apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || "",
+  baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+});
+
+function isClaudeModel(model: string): boolean {
+  return model.startsWith("claude-");
+}
+
+async function generateJsonCompletion(
+  systemPrompt: string,
+  userPrompt: string,
+  model: string
+): Promise<string> {
+  if (isClaudeModel(model)) {
+    const message = await anthropic.messages.create({
+      model,
+      max_tokens: 8192,
+      system: systemPrompt + "\n\nIMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation.",
+      messages: [{ role: "user", content: userPrompt }],
+    });
+    const block = message.content[0];
+    if (block.type !== "text") throw new Error("No text response from Claude");
+    let text = block.text.trim();
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) text = jsonMatch[1].trim();
+    return text;
+  } else {
+    const response = await openai.chat.completions.create({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: 4096,
+    });
+    const content = response.choices[0]?.message?.content;
+    if (!content) throw new Error("No response from AI");
+    return content;
+  }
+}
 
 // Schema for validating AI response
 const generatedPrdSchema = z.object({
@@ -58,13 +102,8 @@ For user stories, use the format:
 Respond with valid JSON matching the exact structure requested. Be thorough and specific.`;
 
 export async function generatePrd(idea: string, model?: string): Promise<GeneratedPrd> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { 
-        role: "user", 
-        content: `Generate a comprehensive PRD for the following product idea:\n\n${idea}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const userPrompt = `Generate a comprehensive PRD for the following product idea:\n\n${idea}\n\nRespond with JSON in this exact format:
 {
   "title": "Product Name",
   "problemStatement": "...",
@@ -83,17 +122,9 @@ export async function generatePrd(idea: string, model?: string): Promise<Generat
   ],
   "outOfScope": ["item 1", "item 2", ...],
   "assumptions": ["assumption 1", "assumption 2", ...]
-}`
-      }
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(systemPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -136,16 +167,9 @@ const generatedUserStoriesSchema = z.object({
 export type GeneratedUserStories = z.infer<typeof generatedUserStoriesSchema>;
 
 export async function generateUserStories(featureIdea: string, model?: string): Promise<GeneratedUserStories> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert product manager specializing in generating comprehensive user stories. Given a feature idea or description, generate 5-8 detailed user stories with acceptance criteria and edge cases. Each story should follow the "As a [user], I want [goal] so that [benefit]" format. Be thorough about edge cases and acceptance criteria. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Generate comprehensive user stories for the following feature idea:\n\n${featureIdea}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const sysPrompt = `You are an expert product manager specializing in generating comprehensive user stories. Given a feature idea or description, generate 5-8 detailed user stories with acceptance criteria and edge cases. Each story should follow the "As a [user], I want [goal] so that [benefit]" format. Be thorough about edge cases and acceptance criteria. Respond with valid JSON.`;
+  const userPrompt = `Generate comprehensive user stories for the following feature idea:\n\n${featureIdea}\n\nRespond with JSON in this exact format:
 {
   "featureName": "Feature Name",
   "userStories": [
@@ -158,17 +182,9 @@ export async function generateUserStories(featureIdea: string, model?: string): 
       "priority": "high"
     }
   ]
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -203,16 +219,9 @@ const refinedProblemSchema = z.object({
 export type RefinedProblem = z.infer<typeof refinedProblemSchema>;
 
 export async function refineProblemStatement(messyProblem: string, model?: string): Promise<RefinedProblem> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert product manager who excels at clarifying and structuring problem statements. Given a messy or unclear problem description, you will refine it into a clear, well-structured problem statement with full context, impact analysis, and success criteria. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Refine and structure the following messy problem description:\n\n${messyProblem}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const sysPrompt = `You are an expert product manager who excels at clarifying and structuring problem statements. Given a messy or unclear problem description, you will refine it into a clear, well-structured problem statement with full context, impact analysis, and success criteria. Respond with valid JSON.`;
+  const userPrompt = `Refine and structure the following messy problem description:\n\n${messyProblem}\n\nRespond with JSON in this exact format:
 {
   "originalProblem": "The original messy problem as provided",
   "refinedStatement": "A clear, concise problem statement",
@@ -222,17 +231,9 @@ export async function refineProblemStatement(messyProblem: string, model?: strin
   "currentSolutions": "Existing workarounds or solutions",
   "proposedApproach": "Recommended approach to solve this",
   "successCriteria": ["criterion 1", "criterion 2"]
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -264,16 +265,9 @@ const prioritizedFeaturesSchema = z.object({
 export type PrioritizedFeatures = z.infer<typeof prioritizedFeaturesSchema>;
 
 export async function prioritizeFeatures(features: string[], model?: string): Promise<PrioritizedFeatures> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert product manager who uses the RICE framework (Reach, Impact, Confidence, Effort) to prioritize features. For each feature, score it on each RICE dimension (1-10), calculate the RICE score as (Reach * Impact * Confidence) / Effort, provide reasoning, a MoSCoW recommendation, and tradeoff analysis. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Prioritize the following features using the RICE framework:\n\n${features.map((f, i) => `${i + 1}. ${f}`).join("\n")}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const sysPrompt = `You are an expert product manager who uses the RICE framework (Reach, Impact, Confidence, Effort) to prioritize features. For each feature, score it on each RICE dimension (1-10), calculate the RICE score as (Reach * Impact * Confidence) / Effort, provide reasoning, a MoSCoW recommendation, and tradeoff analysis. Respond with valid JSON.`;
+  const userPrompt = `Prioritize the following features using the RICE framework:\n\n${features.map((f, i) => `${i + 1}. ${f}`).join("\n")}\n\nRespond with JSON in this exact format:
 {
   "features": [
     {
@@ -289,17 +283,9 @@ export async function prioritizeFeatures(features: string[], model?: string): Pr
     }
   ],
   "summary": "Overall prioritization summary and recommendations"
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -335,16 +321,9 @@ const sprintPlanSchema = z.object({
 export type SprintPlan = z.infer<typeof sprintPlanSchema>;
 
 export async function planSprint(backlog: string, model?: string): Promise<SprintPlan> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert scrum master specializing in sprint planning. Given a backlog description, you will create a detailed sprint plan with a clear sprint goal, story point estimates, priority assignments, risk analysis, and actionable recommendations. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Plan a sprint based on the following backlog:\n\n${backlog}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const sysPrompt = `You are an expert scrum master specializing in sprint planning. Given a backlog description, you will create a detailed sprint plan with a clear sprint goal, story point estimates, priority assignments, risk analysis, and actionable recommendations. Respond with valid JSON.`;
+  const userPrompt = `Plan a sprint based on the following backlog:\n\n${backlog}\n\nRespond with JSON in this exact format:
 {
   "sprintGoal": "Clear sprint goal statement",
   "duration": "2 weeks",
@@ -366,17 +345,9 @@ export async function planSprint(backlog: string, model?: string): Promise<Sprin
   ],
   "totalPoints": 30,
   "recommendations": ["recommendation 1", "recommendation 2"]
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -404,16 +375,9 @@ const interviewAnswerSchema = z.object({
 export type InterviewAnswer = z.infer<typeof interviewAnswerSchema>;
 
 export async function prepareInterviewAnswer(question: string, model?: string): Promise<InterviewAnswer> {
-  const response = await openai.chat.completions.create({
-    model: model || "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are a senior PM interview coach with extensive experience at top tech companies. Given a PM interview question, provide a structured answer using an appropriate framework, key talking points, a concrete example scenario, potential follow-up questions, constructive feedback, and practical tips. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Prepare a strong answer for the following PM interview question:\n\n${question}\n\nRespond with JSON in this exact format:
+  const selectedModel = model || "gpt-5.2";
+  const sysPrompt = `You are a senior PM interview coach with extensive experience at top tech companies. Given a PM interview question, provide a structured answer using an appropriate framework, key talking points, a concrete example scenario, potential follow-up questions, constructive feedback, and practical tips. Respond with valid JSON.`;
+  const userPrompt = `Prepare a strong answer for the following PM interview question:\n\n${question}\n\nRespond with JSON in this exact format:
 {
   "question": "The original question",
   "framework": "Name and description of the framework used",
@@ -423,17 +387,9 @@ export async function prepareInterviewAnswer(question: string, model?: string): 
   "followUpQuestions": ["follow-up 1", "follow-up 2"],
   "feedback": "Constructive feedback on how to improve the answer",
   "tips": ["tip 1", "tip 2"]
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, selectedModel);
 
   try {
     const rawParsed = JSON.parse(content);
@@ -452,29 +408,13 @@ const rewrittenSectionSchema = z.object({
 });
 
 export async function rewritePrdSection(sectionName: string, currentContent: string, instruction: string): Promise<{ rewrittenContent: string }> {
-  const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert product manager specializing in writing and refining PRD sections. Given a section name, its current content, and a rewrite instruction, produce an improved version of the section content. Maintain professional tone and ensure the rewritten content is clear, specific, and actionable. Respond with valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Rewrite the following PRD section based on the given instruction.\n\nSection: ${sectionName}\n\nCurrent Content:\n${currentContent}\n\nInstruction: ${instruction}\n\nRespond with JSON in this exact format:
+  const sysPrompt = `You are an expert product manager specializing in writing and refining PRD sections. Given a section name, its current content, and a rewrite instruction, produce an improved version of the section content. Maintain professional tone and ensure the rewritten content is clear, specific, and actionable. Respond with valid JSON.`;
+  const userPrompt = `Rewrite the following PRD section based on the given instruction.\n\nSection: ${sectionName}\n\nCurrent Content:\n${currentContent}\n\nInstruction: ${instruction}\n\nRespond with JSON in this exact format:
 {
   "rewrittenContent": "The improved section content"
-}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: 4096,
-  });
+}`;
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
+  const content = await generateJsonCompletion(sysPrompt, userPrompt, "gpt-5.2");
 
   try {
     const rawParsed = JSON.parse(content);

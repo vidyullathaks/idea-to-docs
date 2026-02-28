@@ -322,10 +322,13 @@ export async function registerRoutes(
 
   app.get("/api/models", async (_req, res) => {
     res.json([
-      { id: "gpt-5.2", name: "GPT-5.2", description: "Most capable, best quality", isDefault: true },
-      { id: "gpt-4.1", name: "GPT-4.1", description: "Fast and reliable" },
-      { id: "gpt-4o", name: "GPT-4o", description: "Balanced speed and quality" },
-      { id: "o3-mini", name: "o3 Mini", description: "Efficient reasoning" },
+      { id: "gpt-5.2", name: "GPT-5.2", description: "Most capable, best quality", isDefault: true, provider: "openai" },
+      { id: "gpt-4.1", name: "GPT-4.1", description: "Fast and reliable", provider: "openai" },
+      { id: "gpt-4o", name: "GPT-4o", description: "Balanced speed and quality", provider: "openai" },
+      { id: "o3-mini", name: "o3 Mini", description: "Efficient reasoning", provider: "openai" },
+      { id: "claude-opus-4-6", name: "Claude Opus 4.6", description: "Most capable Claude model", provider: "anthropic" },
+      { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6", description: "Balanced Claude model", provider: "anthropic" },
+      { id: "claude-haiku-4-5", name: "Claude Haiku 4.5", description: "Fast and compact", provider: "anthropic" },
     ]);
   });
 
