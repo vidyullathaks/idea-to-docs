@@ -135,9 +135,9 @@ const generatedUserStoriesSchema = z.object({
 
 export type GeneratedUserStories = z.infer<typeof generatedUserStoriesSchema>;
 
-export async function generateUserStories(featureIdea: string): Promise<GeneratedUserStories> {
+export async function generateUserStories(featureIdea: string, model?: string): Promise<GeneratedUserStories> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       {
         role: "system",
@@ -202,9 +202,9 @@ const refinedProblemSchema = z.object({
 
 export type RefinedProblem = z.infer<typeof refinedProblemSchema>;
 
-export async function refineProblemStatement(messyProblem: string): Promise<RefinedProblem> {
+export async function refineProblemStatement(messyProblem: string, model?: string): Promise<RefinedProblem> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       {
         role: "system",
@@ -263,9 +263,9 @@ const prioritizedFeaturesSchema = z.object({
 
 export type PrioritizedFeatures = z.infer<typeof prioritizedFeaturesSchema>;
 
-export async function prioritizeFeatures(features: string[]): Promise<PrioritizedFeatures> {
+export async function prioritizeFeatures(features: string[], model?: string): Promise<PrioritizedFeatures> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       {
         role: "system",
@@ -334,9 +334,9 @@ const sprintPlanSchema = z.object({
 
 export type SprintPlan = z.infer<typeof sprintPlanSchema>;
 
-export async function planSprint(backlog: string): Promise<SprintPlan> {
+export async function planSprint(backlog: string, model?: string): Promise<SprintPlan> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       {
         role: "system",
@@ -403,9 +403,9 @@ const interviewAnswerSchema = z.object({
 
 export type InterviewAnswer = z.infer<typeof interviewAnswerSchema>;
 
-export async function prepareInterviewAnswer(question: string): Promise<InterviewAnswer> {
+export async function prepareInterviewAnswer(question: string, model?: string): Promise<InterviewAnswer> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: model || "gpt-5.2",
     messages: [
       {
         role: "system",

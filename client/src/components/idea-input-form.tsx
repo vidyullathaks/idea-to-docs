@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ModelSelector } from "@/components/model-selector";
 
 const formSchema = z.object({
   idea: z.string().min(20, "Please provide at least 20 characters to describe your idea"),
@@ -25,6 +26,8 @@ interface IdeaInputFormProps {
   onSubmit: (idea: string) => void;
   isLoading: boolean;
   initialIdea?: string;
+  model: string;
+  onModelChange: (model: string) => void;
 }
 
 const exampleIdeas = [
@@ -33,7 +36,7 @@ const exampleIdeas = [
   "A browser extension that summarizes long articles into key bullet points",
 ];
 
-export function IdeaInputForm({ onSubmit, isLoading, initialIdea }: IdeaInputFormProps) {
+export function IdeaInputForm({ onSubmit, isLoading, initialIdea, model, onModelChange }: IdeaInputFormProps) {
   const [selectedExample, setSelectedExample] = useState<string | null>(null);
   
   const form = useForm<FormData>({
@@ -90,6 +93,8 @@ export function IdeaInputForm({ onSubmit, isLoading, initialIdea }: IdeaInputFor
                 </FormItem>
               )}
             />
+
+            <ModelSelector value={model} onChange={onModelChange} />
             
             <Button 
               type="submit" 

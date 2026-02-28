@@ -50,6 +50,7 @@ const templates = [
 ];
 
 const liveFeatures = [
+  { icon: Cpu, label: "Multi-model support" },
   { icon: Download, label: "Export as PDF or Markdown" },
   { icon: Pencil, label: "Inline editing with version history" },
   { icon: Link2, label: "Shareable links" },
@@ -58,7 +59,6 @@ const liveFeatures = [
 
 const roadmapItems = [
   { icon: Users, label: "Collaborative editing", status: "planned" as const },
-  { icon: Cpu, label: "Multi-model support", status: "coming-soon" as const },
   { icon: UserCircle, label: "User accounts + cloud sync", status: "planned" as const },
   { icon: ExternalLink, label: "Export to Notion / Jira", status: "planned" as const },
   { icon: Globe, label: "Multi-language support", status: "planned" as const },
@@ -70,6 +70,7 @@ export default function Home() {
   const [viewState, setViewState] = useState<ViewState>("input");
   const [selectedPrd, setSelectedPrd] = useState<Prd | null>(null);
   const [templateIdea, setTemplateIdea] = useState("");
+  const [model, setModel] = useState("gpt-5.2");
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -79,7 +80,7 @@ export default function Home() {
 
   const generateMutation = useMutation({
     mutationFn: async (idea: string) => {
-      const response = await apiRequest("POST", "/api/prds/generate", { idea });
+      const response = await apiRequest("POST", "/api/prds/generate", { idea, model });
       const prd = await response.json();
       return prd as Prd;
     },
@@ -187,6 +188,8 @@ export default function Home() {
               onSubmit={handleSubmit}
               isLoading={generateMutation.isPending}
               initialIdea={templateIdea}
+              model={model}
+              onModelChange={setModel}
             />
 
             {prds.length > 0 && (
@@ -253,6 +256,8 @@ export default function Home() {
             onSubmit={handleSubmit}
             isLoading={generateMutation.isPending}
             initialIdea={templateIdea}
+            model={model}
+            onModelChange={setModel}
           />
         )}
 

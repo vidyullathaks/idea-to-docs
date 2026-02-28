@@ -322,14 +322,16 @@ export async function registerRoutes(
 
   app.get("/api/models", async (_req, res) => {
     res.json([
-      { id: "gpt-4o", name: "GPT-4o", description: "Fast and capable" },
+      { id: "gpt-5.2", name: "GPT-5.2", description: "Most capable, best quality", isDefault: true },
+      { id: "gpt-4.1", name: "GPT-4.1", description: "Fast and reliable" },
+      { id: "gpt-4o", name: "GPT-4o", description: "Balanced speed and quality" },
       { id: "o3-mini", name: "o3 Mini", description: "Efficient reasoning" },
-      { id: "gpt-4.1", name: "GPT-4.1", description: "Latest model" },
     ]);
   });
 
   const userStoryInputSchema = z.object({
     featureIdea: z.string().min(10, "Feature idea must be at least 10 characters"),
+    model: z.string().optional(),
   });
 
   app.post("/api/tools/user-stories", async (req, res) => {
@@ -338,7 +340,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await generateUserStories(validation.data.featureIdea);
+      const result = await generateUserStories(validation.data.featureIdea, validation.data.model);
       res.json(result);
     } catch (error) {
       console.error("Error generating user stories:", error);
@@ -348,6 +350,7 @@ export async function registerRoutes(
 
   const problemSchema = z.object({
     problem: z.string().min(10, "Problem description must be at least 10 characters"),
+    model: z.string().optional(),
   });
 
   app.post("/api/tools/refine-problem", async (req, res) => {
@@ -356,7 +359,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await refineProblemStatement(validation.data.problem);
+      const result = await refineProblemStatement(validation.data.problem, validation.data.model);
       res.json(result);
     } catch (error) {
       console.error("Error refining problem:", error);
@@ -366,6 +369,7 @@ export async function registerRoutes(
 
   const featuresSchema = z.object({
     features: z.array(z.string().min(1)).min(2, "Provide at least 2 features to prioritize"),
+    model: z.string().optional(),
   });
 
   app.post("/api/tools/prioritize-features", async (req, res) => {
@@ -374,7 +378,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await prioritizeFeatures(validation.data.features);
+      const result = await prioritizeFeatures(validation.data.features, validation.data.model);
       res.json(result);
     } catch (error) {
       console.error("Error prioritizing features:", error);
@@ -384,6 +388,7 @@ export async function registerRoutes(
 
   const sprintSchema = z.object({
     backlog: z.string().min(20, "Backlog must be at least 20 characters"),
+    model: z.string().optional(),
   });
 
   app.post("/api/tools/plan-sprint", async (req, res) => {
@@ -392,7 +397,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await planSprint(validation.data.backlog);
+      const result = await planSprint(validation.data.backlog, validation.data.model);
       res.json(result);
     } catch (error) {
       console.error("Error planning sprint:", error);
@@ -402,6 +407,7 @@ export async function registerRoutes(
 
   const interviewSchema = z.object({
     question: z.string().min(10, "Question must be at least 10 characters"),
+    model: z.string().optional(),
   });
 
   app.post("/api/tools/interview-prep", async (req, res) => {
@@ -410,7 +416,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await prepareInterviewAnswer(validation.data.question);
+      const result = await prepareInterviewAnswer(validation.data.question, validation.data.model);
       res.json(result);
     } catch (error) {
       console.error("Error preparing interview answer:", error);
@@ -556,7 +562,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await generateUserStories(validation.data.featureIdea);
+      const result = await generateUserStories(validation.data.featureIdea, validation.data.model);
       const saved = await storage.createToolResult({
         toolType: "user-stories",
         title: result.featureName || "User Stories",
@@ -576,7 +582,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await refineProblemStatement(validation.data.problem);
+      const result = await refineProblemStatement(validation.data.problem, validation.data.model);
       const saved = await storage.createToolResult({
         toolType: "problem-refiner",
         title: "Refined Problem Statement",
@@ -596,7 +602,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await prioritizeFeatures(validation.data.features);
+      const result = await prioritizeFeatures(validation.data.features, validation.data.model);
       const saved = await storage.createToolResult({
         toolType: "feature-prioritizer",
         title: "Feature Prioritization",
@@ -616,7 +622,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await planSprint(validation.data.backlog);
+      const result = await planSprint(validation.data.backlog, validation.data.model);
       const saved = await storage.createToolResult({
         toolType: "sprint-planner",
         title: result.sprintGoal || "Sprint Plan",
@@ -636,7 +642,7 @@ export async function registerRoutes(
       if (!validation.success) {
         return res.status(400).json({ message: validation.error.errors[0]?.message || "Invalid input" });
       }
-      const result = await prepareInterviewAnswer(validation.data.question);
+      const result = await prepareInterviewAnswer(validation.data.question, validation.data.model);
       const saved = await storage.createToolResult({
         toolType: "interview-prep",
         title: result.question || "Interview Prep",

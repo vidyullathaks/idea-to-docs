@@ -4,6 +4,13 @@
 IdeaForge is a comprehensive AI-powered PM toolkit with 7+ tools that help product managers, founders, and aspiring PMs work faster. Built with React, Express, and OpenAI GPT-5.2.
 
 ## Recent Changes
+- **2026-02-28**: Multi-model support
+  - Added model selector (GPT-5.2, GPT-4.1, GPT-4o, o3 Mini) to all tool pages and PRD Generator
+  - Created reusable ModelSelector component (client/src/components/model-selector.tsx)
+  - All backend AI generation functions accept optional `model` parameter
+  - All API routes pass model through to OpenAI calls
+  - GET /api/models endpoint returns available models with descriptions
+  - Moved "Multi-model support" from roadmap to shipped features on home page
 - **2026-02-10**: Extended production features to ALL 5 AI tools
   - Created tool_results and tool_result_versions database tables for persistent storage
   - Built reusable ToolResultDisplay component with inline editing, version history, shareable links, and export

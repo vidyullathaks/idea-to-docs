@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ToolResultDisplay } from "@/components/tool-result-display";
+import { ModelSelector } from "@/components/model-selector";
 import type { ToolResult } from "@shared/schema";
 
 function ExampleSuggestion({ examples, onSelect }: { examples: string[]; onSelect: (text: string) => void }) {
@@ -42,12 +43,13 @@ function ExampleSuggestion({ examples, onSelect }: { examples: string[]; onSelec
 
 export function UserStoryGenerator() {
   const [input, setInput] = useState("");
+  const [model, setModel] = useState("gpt-5.2");
   const [savedResult, setSavedResult] = useState<ToolResult | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async (featureIdea: string) => {
-      const res = await apiRequest("POST", "/api/tools/user-stories/generate", { featureIdea });
+      const res = await apiRequest("POST", "/api/tools/user-stories/generate", { featureIdea, model });
       return res.json() as Promise<ToolResult>;
     },
     onSuccess: (data) => setSavedResult(data),
@@ -109,6 +111,7 @@ export function UserStoryGenerator() {
               data-testid="input-feature-idea"
             />
           </div>
+          <ModelSelector value={model} onChange={setModel} />
           <Button
             className="w-full"
             onClick={handleSubmit}
@@ -143,12 +146,13 @@ export function UserStoryGenerator() {
 
 export function ProblemRefiner() {
   const [input, setInput] = useState("");
+  const [model, setModel] = useState("gpt-5.2");
   const [savedResult, setSavedResult] = useState<ToolResult | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async (problem: string) => {
-      const res = await apiRequest("POST", "/api/tools/refine-problem/generate", { problem });
+      const res = await apiRequest("POST", "/api/tools/refine-problem/generate", { problem, model });
       return res.json() as Promise<ToolResult>;
     },
     onSuccess: (data) => setSavedResult(data),
@@ -208,6 +212,7 @@ export function ProblemRefiner() {
             onChange={(e) => setInput(e.target.value)}
             data-testid="input-problem"
           />
+          <ModelSelector value={model} onChange={setModel} />
           <Button
             className="w-full"
             onClick={handleSubmit}
@@ -240,12 +245,13 @@ export function ProblemRefiner() {
 
 export function FeaturePrioritizer() {
   const [features, setFeatures] = useState<string[]>(["", "", ""]);
+  const [model, setModel] = useState("gpt-5.2");
   const [savedResult, setSavedResult] = useState<ToolResult | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async (featureList: string[]) => {
-      const res = await apiRequest("POST", "/api/tools/prioritize-features/generate", { features: featureList });
+      const res = await apiRequest("POST", "/api/tools/prioritize-features/generate", { features: featureList, model });
       return res.json() as Promise<ToolResult>;
     },
     onSuccess: (data) => setSavedResult(data),
@@ -344,6 +350,7 @@ export function FeaturePrioritizer() {
             <Plus className="h-4 w-4" />
             Add Feature
           </Button>
+          <ModelSelector value={model} onChange={setModel} />
           <Button
             className="w-full"
             onClick={handleSubmit}
@@ -370,12 +377,13 @@ export function FeaturePrioritizer() {
 
 export function SprintPlanner() {
   const [input, setInput] = useState("");
+  const [model, setModel] = useState("gpt-5.2");
   const [savedResult, setSavedResult] = useState<ToolResult | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async (backlog: string) => {
-      const res = await apiRequest("POST", "/api/tools/plan-sprint/generate", { backlog });
+      const res = await apiRequest("POST", "/api/tools/plan-sprint/generate", { backlog, model });
       return res.json() as Promise<ToolResult>;
     },
     onSuccess: (data) => setSavedResult(data),
@@ -435,6 +443,7 @@ export function SprintPlanner() {
             onChange={(e) => setInput(e.target.value)}
             data-testid="input-backlog"
           />
+          <ModelSelector value={model} onChange={setModel} />
           <Button
             className="w-full"
             onClick={handleSubmit}
@@ -467,12 +476,13 @@ export function SprintPlanner() {
 
 export function InterviewPrep() {
   const [input, setInput] = useState("");
+  const [model, setModel] = useState("gpt-5.2");
   const [savedResult, setSavedResult] = useState<ToolResult | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async (question: string) => {
-      const res = await apiRequest("POST", "/api/tools/interview-prep/generate", { question });
+      const res = await apiRequest("POST", "/api/tools/interview-prep/generate", { question, model });
       return res.json() as Promise<ToolResult>;
     },
     onSuccess: (data) => setSavedResult(data),
@@ -532,6 +542,7 @@ export function InterviewPrep() {
             onChange={(e) => setInput(e.target.value)}
             data-testid="input-question"
           />
+          <ModelSelector value={model} onChange={setModel} />
           <Button
             className="w-full"
             onClick={handleSubmit}
