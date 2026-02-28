@@ -160,6 +160,28 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         {viewState === "input" && !selectedPrd && (
           <div className="space-y-8">
+            <IdeaInputForm
+              onSubmit={handleSubmit}
+              isLoading={generateMutation.isPending}
+              initialIdea={templateIdea}
+              model={model}
+              onModelChange={setModel}
+            />
+
+            {prds.length > 0 && (
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/prds")}
+                  data-testid="button-view-prds"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  View Your PRDs ({prds.length})
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
             <section data-testid="section-templates">
               <h2 className="text-lg font-semibold mb-3" data-testid="text-templates-header">Start with a Template</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -183,28 +205,6 @@ export default function Home() {
                 ))}
               </div>
             </section>
-
-            <IdeaInputForm
-              onSubmit={handleSubmit}
-              isLoading={generateMutation.isPending}
-              initialIdea={templateIdea}
-              model={model}
-              onModelChange={setModel}
-            />
-
-            {prds.length > 0 && (
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/prds")}
-                  data-testid="button-view-prds"
-                >
-                  <FileText className="mr-2 h-4 w-4" />
-                  View Your PRDs ({prds.length})
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            )}
 
             <section className="border-t border-border/50 pt-8" data-testid="section-features">
               <div className="text-center mb-6">
