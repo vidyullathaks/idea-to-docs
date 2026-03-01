@@ -1,6 +1,8 @@
 # **IdeaForge - AI-Powered PM Toolkit**
 Transform rough product ideas into complete PRDs, user stories, sprint plans, and more — powered by AI.
 
+**[Live Demo](https://ideaforge.replit.app)** | **[Source Code](https://github.com/vidyullathaks/idea-to-docs)**
+
 ---
 
 ## Overview
@@ -94,7 +96,7 @@ Sample PRDs and idea templates help users get started quickly.
 - Node.js + Express.js 5 + TypeScript
 - Drizzle ORM (type-safe database access and migrations)
 - PostgreSQL
-- OpenAI SDK (GPT integration via Replit AI services)
+- OpenAI SDK (GPT-5.2 default, with gpt-4o, o3-mini, gpt-4.1 selectable via Replit AI services)
 - Passport (authentication)
 - express-session (session management)
 - Zod (API input validation)
@@ -209,24 +211,39 @@ idea-to-docs/
 ### AI Tool Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/tools/user-stories/generate` | Generate user stories |
-| POST | `/api/tools/refine-problem/generate` | Refine a problem statement |
-| POST | `/api/tools/prioritize-features/generate` | Prioritize features (RICE) |
-| POST | `/api/tools/plan-sprint/generate` | Generate a sprint plan |
-| POST | `/api/tools/interview-prep/generate` | Prepare interview answers |
+| POST | `/api/tools/user-stories` | Generate user stories (stateless) |
+| POST | `/api/tools/refine-problem` | Refine a problem statement (stateless) |
+| POST | `/api/tools/prioritize-features` | Prioritize features via RICE (stateless) |
+| POST | `/api/tools/plan-sprint` | Generate a sprint plan (stateless) |
+| POST | `/api/tools/interview-prep` | Prepare interview answers (stateless) |
+| POST | `/api/tools/user-stories/generate` | Generate user stories and save to DB |
+| POST | `/api/tools/refine-problem/generate` | Refine a problem and save to DB |
+| POST | `/api/tools/prioritize-features/generate` | Prioritize features and save to DB |
+| POST | `/api/tools/plan-sprint/generate` | Generate a sprint plan and save to DB |
+| POST | `/api/tools/interview-prep/generate` | Prepare interview answers and save to DB |
 | POST | `/api/tools/rewrite-section` | AI rewrite of a PRD section |
 
-### Tool Results, Templates & Analytics
+### Tool Results
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/tool-results` | List all tool results |
-| PATCH | `/api/tool-results/:id` | Update a tool result |
+| GET | `/api/tool-results` | List all tool results (optional `?toolType=` filter) |
+| GET | `/api/tool-results/:id` | Get a single tool result |
+| PATCH | `/api/tool-results/:id` | Update a tool result (creates version snapshot) |
 | DELETE | `/api/tool-results/:id` | Delete a tool result |
-| POST | `/api/tool-results/:id/share` | Share a tool result |
+| POST | `/api/tool-results/:id/share` | Generate a shareable link |
+| GET | `/api/shared/tool/:shareId` | Get a shared tool result (read-only) |
+| GET | `/api/tool-results/:id/versions` | Get version history |
+| POST | `/api/tool-results/:id/versions/:versionId/restore` | Restore a version |
+
+### Templates, Analytics & Models
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | GET | `/api/templates` | List custom templates |
 | POST | `/api/templates` | Create a template |
 | DELETE | `/api/templates/:id` | Delete a template |
+| POST | `/api/analytics/export` | Log an export event |
 | GET | `/api/analytics/summary` | Usage analytics summary |
+| GET | `/api/models` | List available AI models |
 
 ---
 
@@ -276,21 +293,22 @@ npm run check      # Run TypeScript compiler
 
 ## Future Enhancements
 
-- Collaborative editing (multi-user)
-- Multi-model support (choose between different AI models)
-- User accounts with cloud sync
-- Analytics dashboard for product teams
+- Multi-model support — choose between different AI models *(coming soon)*
+- Collaborative editing — multi-user real-time editing *(planned)*
+- User accounts with cloud sync *(planned)*
+- Export to Notion / Jira *(planned)*
+- Multi-language support *(planned)*
 
 ---
 
 ## Development Approach
-This project was built using a combination of traditional development and AI-assisted coding workflows on Replit. Leveraging Replit's AI tools enabled rapid prototyping and allowed focus on product strategy, UX, and prompt engineering while maintaining full ownership of the architecture and implementation.
+This project was built using Replit and Claude, combining traditional development with AI-assisted coding workflows. Leveraging Replit for hosting and rapid prototyping, and Claude for AI-assisted development, enabled focus on product strategy, UX, and prompt engineering while maintaining full ownership of the architecture and implementation.
 
 ---
 
 ## Author
 
-Built by **Vidyullatha**, aspiring AI Product Manager.
+Built by **Vidyullatha KS** — Product Manager specializing in AI-Powered Analytics & Data-Driven Solutions.
 This project showcases practical AI product development, prompt engineering, and full-stack deployment.
 
 ---
