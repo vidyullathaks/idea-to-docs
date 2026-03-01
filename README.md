@@ -1,7 +1,7 @@
 # **IdeaForge - AI-Powered PM Toolkit**
 Transform rough product ideas into complete PRDs, user stories, sprint plans, and more — powered by AI.
 
-**[Live Demo](https://ideaforge.replit.app)** | **[Source Code](https://github.com/vidyullathaks/idea-to-docs)**
+**[Live Demo](https://idea-to-docs.replit.app)** | **[Source Code](https://github.com/vidyullathaks/idea-to-docs)**
 
 ---
 
